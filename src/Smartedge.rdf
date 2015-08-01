@@ -1,0 +1,138 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Smartedge.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:                
+//                       
+//                      
+
+// Vendor: smartedge (2352)
+
+type record smartedge_type
+{
+  smartedge_type_enum               f_smartedge_type,
+  UINT8                           attrib_length_spec,
+  vendor_specific_value           string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_smartedge_type, attrib_length_spec, string_val)"
+  variant (string_val) "CROSSTAG(
+    integer_val, { f_smartedge_type=rb_medium_type,
+                  f_smartedge_type=rb_nas_real_port,
+                  f_smartedge_type=rb_platform_type,
+                  f_smartedge_type=rb_service_error_cause,
+                  f_smartedge_type=rb_mcast_maxgroups,
+                  f_smartedge_type=rb_mcast_send,
+                  f_smartedge_type=rb_mcast_receive,
+                  f_smartedge_type=rb_acct_reason,
+                  f_smartedge_type=rb_acct_mcast_in_packets,
+                  f_smartedge_type=rb_acct_mcast_out_packets,
+                  f_smartedge_type=rb_session_error_code,
+                  f_smartedge_type=rb_acct_mcast_in_octets,
+                  f_smartedge_type=rb_acct_mcast_out_octets,
+                  f_smartedge_type=rb_dhcp_max_leases,
+                  f_smartedge_type=rb_offload_indication,
+                  f_smartedge_type=rb_vcpe_id
+		  };
+    integer64_val, { f_smartedge_type=rb_acct_input_octets_64,
+                  f_smartedge_type=rb_acct_output_octets_64,
+                  f_smartedge_type=rb_acct_input_packets_64,
+                  f_smartedge_type=rb_acct_output_packets_64,
+                  f_smartedge_type=rb_acct_mcast_in_octets_64,
+                  f_smartedge_type=rb_acct_mcast_out_octets_64,
+                  f_smartedge_type=rb_acct_mcast_in_packets_64,
+                  f_smartedge_type=rb_acct_mcast_out_packets_64
+                 };
+    tagged_integer,  f_smartedge_type=rb_service_options;
+    tagged_text, { f_smartedge_type=rb_deactivate_service_name,
+                  f_smartedge_type=rb_service_name,
+                  f_smartedge_type=rb_service_parameter};
+
+    string_val, OTHERWISE
+  )"
+}
+
+type set of smartedge_type smartedge_subattr_list;
+
+type enum_8 smartedge_type_enum
+{ 
+ rb_dhcp_max_leases                (3),
+  rb_context_name                  (4),
+  rb_mcast_send                   (33),
+  rb_mcast_receive                (34),
+  rb_mcast_maxgroups              (35),
+  rb_medium_type                  (38),
+  rb_nas_real_port                (62),
+  rb_pppoe_ip_route_add           (71),
+  rb_qos_policing_profile_name    (87),
+  rb_qos_metering_profile_name    (88),
+  rb_qos_queuing_profile_name     (89),
+  rb_igmp_service_profile_name    (90),
+  rb_forward_policy               (92),
+  rb_agent_remote_id              (96),
+  rb_agent_circuit_id             (97),
+  rb_platform_type                (98),
+  rb_atm_profile_name            (101),
+  rb_nat_profile_name            (105),
+  rb_http_redirect_profile_name  (107),
+  rb_os_version                  (112),
+  rb_session_traffic_limit       (113),
+
+  rb_acct_input_octets_64        (128),
+  rb_acct_output_octets_64       (129),
+  rb_acct_input_packets_64       (130),
+  rb_acct_output_packets_64      (131),
+  rb_assigned_ip_address         (132),
+  rb_acct_mcast_in_octets_64     (133),
+  rb_acct_mcast_out_octets_64    (134),
+  rb_acct_mcast_in_packets_64    (135),
+  rb_acct_mcast_out_packets_64   (136),
+
+  rb_session_error_code          (142),
+  rb_session_msg                 (143),
+
+  rb_acct_reason                 (144),
+  rb_mac_address                 (145),
+  rb_acct_mcast_in_octets        (147),
+  rb_acct_mcast_out_octets       (148),
+  rb_acct_mcast_in_packets       (149),
+  rb_acct_mcast_out_packets      (150),
+
+  rb_qos_rate_inbound            (156),
+  rb_qos_rate_outbound           (157),
+  rb_http_redirect_url           (165),
+  rb_service_name                (190),
+  rb_service_options             (191),
+  rb_service_parameter           (192),
+  rb_service_error_cause         (193),
+  rb_deactivate_service_name     (194),
+  rb_dynamic_qos_param           (196),
+  rb_reauth_service_name         (204),
+  rb_ipv6_dns			 (207),
+  rb_ipv6_profile		 (209),
+  
+  rb_offload_indication          (224),
+  rb_gtp_tunnel_data             (225),
+  
+  rb_vcpe_id                     (232),
+  rb_vcpe_profile                (233),
+  rb_vcpe_transport_policy       (234),
+  rb_vcpe_device_policy          (235),
+  rb_vcpe_mac_ip_pair            (236)
+}

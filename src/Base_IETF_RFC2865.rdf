@@ -1,0 +1,305 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Base_IETF_RFC2865.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 2865(RADIUS)       
+//                       
+//                      
+//
+
+
+// APPLICATION-NAME: Base
+// APPLICATION-REVISION: RFC2865
+
+
+
+// Packet-Type: Access-Request (1)
+
+// Packet-Type: Access_Accept (2)
+
+// Packet-Type: Access_Reject (3)
+
+// Packet-Type: Accounting_Request (4) 
+
+// Packet-Type: Accounting_Response (5)
+
+// Packet-Type: Access_Challenge (11)
+
+// Packet-Type: Status_Server (12)
+
+// Packet-Type: Status_Client (13)
+
+// Packet-Type: Reserved (255)
+
+
+
+
+// RFC 2865
+// Attrib: User-Name (1)
+type Attrib_String User_Name;
+
+// RFC 2865
+// Attrib: User-Password (2)
+type Attrib_String User_Password;
+
+// RFC 2865
+// Attrib: CHAP-Password (3)
+type record CHAP_Password 
+{
+  UINT8 CHAP_Ident,
+  Attrib_String String length(16)
+}
+
+// RFC 2865
+// Attrib: NAS-IP-Address (4)
+type Attrib_Address NAS_IP_Address;
+
+// RFC 2865
+// Attrib: NAS-Port (5)
+type Attrib_Value NAS_Port;
+
+// RFC 2865
+// Attrib: Service-Type (6)
+type enumerated Service_Type
+{
+  Login (1),
+  Framed (2),
+  Callback_Login (3),
+  Callback_Framed (4),
+  Outbound (5),
+  Administrative (6),
+  NAS_Prompt (7),
+  Authenticate_Only (8),
+  Callback_NAS_Prompt (9),
+  Call_Check (10),
+  Callback_Administrative (11),
+  Authorize_Only  (17)
+}
+
+
+// RFC 2865
+// Attrib: Framed-Protocol (7)
+type enumerated Framed_Protocol
+{
+  PPP (1),
+  SLIP (2),
+  Appletalk_Remote_Access_Protocol (3),
+  Gandalf_proprietary_protocol (4),
+  Xylogics_proprietary (5),
+  Xpoint75_Syncronous (6),
+  GPRS_PDP_Context (7)  
+}
+
+
+// RFC 2865
+// Attrib: Framed-IP-Address (8)
+type Attrib_Address Framed_IP_Address;
+
+// RFC 2865
+// Attrib: Framed-IP-Netmask (9)
+type Attrib_Address Framed_IP_Netmask;
+
+// RFC 2865
+// Attrib: Framed-Routing (10)
+type enumerated Framed_Routing
+{
+  None (0),
+  Send_routing_pacets (1),
+  Listen_for_routing_pacets (2),
+  Send_and_Listen (3)
+}
+
+// RFC 2865
+// Attrib: Filter-Id (11)
+type Attrib_Text Filter_Id;
+
+// RFC 2865
+// Attrib: Framed-MTU (12)
+type Attrib_Value Framed_MTU (64..65535);
+
+// RFC 2865
+// Attrib: Framed-Compression (13)
+type enumerated Framed_Compression
+{
+  None (0),
+  VJ_TCP_IP_header_compression (1),
+  IPX_header_compression (2),
+  STAC_LZS_compression (3)
+}
+
+// RFC 2865
+// Attrib: Login-IP-Host (14)
+type Attrib_Address Login_IP_Host;
+
+// RFC 2865
+// Attrib: Login-Service (15)
+type enumerated Login_Service
+{
+  Telnet (0),
+  Rlogin (1),
+  TCP_Clear (2),
+  Port_Master (3),
+  LAT (4),
+  X25_PAD (5),
+  X25_T3POS (6),
+  TCP_Clear_Quiet (7)
+}
+
+// RFC 2865
+// Attrib: Login-TCP-Port (16)
+type Attrib_Value Login_TCP_Port (0..65535);
+
+// RFC 2865
+// Attrib: Reply-Message (18)
+type Attrib_Text Reply_Message;
+
+// RFC 2865
+// Attrib: Callback-Number (19)
+type Attrib_String Callback_Number;
+
+// RFC 2865
+// Attrib: Callback-Id (20)
+type Attrib_String Callback_Id;
+
+// RFC 2865
+// Attrib: Framed-Route (22)
+type Attrib_Text Framed_Route;
+
+// RFC 2865
+// Attrib: Framed-IPX-Network (23)
+type Attrib_Value Framed_IPX_Network;
+
+// RFC 2865
+// Attrib: State (24)
+type Attrib_String State;
+
+// RFC 2865
+// Attrib: Class (25)
+type Attrib_String Class;
+
+
+// RFC 2865
+// Attrib: Session-Timeout (27)
+type Attrib_Value Session_Timeout;
+
+// RFC 2865
+// Attrib: Idle-Timeout (28)
+type Attrib_Value Idle_Timeout;
+
+// RFC 2865
+// Attrib: Termination-Action (29)
+type enumerated Termination_Action
+{
+  Default (0),
+  RADIUS_Request (1)
+}
+
+// RFC 2865
+// Attrib: Called-Station-Id (30)
+type Attrib_String Called_Station_Id;
+
+// RFC 2865
+// Attrib: Calling-Station-Id (31)
+type Attrib_String Calling_Station_Id;
+
+// RFC 2865
+// Attrib: NAS-Identifier (32)
+type Attrib_String NAS_Identifier;
+
+// RFC 2865
+// Attrib: Proxy-State (33)
+type Attrib_String Proxy_State;
+
+// RFC 2865
+// Attrib: Login-LAT-Service (34)
+type Attrib_String Login_LAT_Service;
+
+// RFC 2865
+// Attrib: Login-LAT-Node (35)
+type Attrib_String Login_LAT_Node;
+
+// RFC 2865
+// Attrib: Login-LAT-Group (36)
+type Attrib_String Login_LAT_Group;
+
+// RFC 2865
+// Attrib: Framed-AppleTalk-Link (37)
+type Attrib_Value Framed_AppleTalk_Link (0..65535);
+
+// RFC 2865
+// Attrib: Framed-AppleTalk-Network (38)
+type Attrib_Value Framed_AppleTalk_Network (0..65535);
+
+// RFC 2865
+// Attrib: Framed-AppleTalk-Zone (39)
+type Attrib_String Framed_AppleTalk_Zone;
+
+// RFC 2865
+// Attrib: CHAP-Challenge (60)
+type Attrib_String CHAP_Challenge;
+
+// RFC 2865
+// Attrib: NAS-Port-Type (61)
+type enumerated NAS_Port_Type
+{
+  Async (0),
+  Sync (1),
+  ISDN_Sync (2),
+  ISDN_Async_v120 (3),
+  ISDN_Async_v110 (4),
+  Virtual (5),
+  PIAFS (6),
+  HDLC_Clear_Channel (7),
+  X25 (8),
+  X75 (9),
+  G3_Fax (10),
+  SDSL_Symmetric_DSL (11),
+  ADSL_CAP_Asymmetric_DSL (12),
+  ADSL_DMT_Asymmetric_DSL (13),
+  ISDL_ISDN_Digital_Subscriber_Line (14),
+  Ethernet (15),
+  xDSL (16),
+  Cable (17),
+  Wireless_Other (18),
+  Wireless_IEEE_80211 (19)
+}
+
+
+// RFC 2865
+// Attrib: Port-Limit (62)
+type Attrib_Value Port_Limit;
+
+// RFC 2865
+// Attrib: Login-LAT-Port (63)
+type Attrib_String Login_LAT_Port;
+
+
+
+// RFC 2865
+// Attrib: Vendor-Specific (26)
+type vendor_specific_type Vendor_Specific
+
+
+
+
+
+
+
+

@@ -1,0 +1,66 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               DynamicAuthorizationExtensions_IETF_RFC5176.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 5176(RADIUS Authorization Extensions)       
+//                      Obsoletes: RFC 3576 
+//                      
+//
+
+
+// APPLICATION-NAME: AuthExt
+// APPLICATION-REVISION: RFC5176
+
+
+// Packet-Type: Disconnect-Request (40) 
+
+// Packet-Type: Disconnect-ACK (41) 
+
+// Packet-Type: Disconnect-NAK (42) 
+
+// Packet-Type: CoA-Request (43) 
+
+// Packet-Type: CoA-ACK (44) 
+
+// Packet-Type: CoA-NAK (45) 
+
+
+// RFC 5176
+// Attrib: Error-Cause (101)
+type enumerated Error_Cause
+{
+  Residual_Session_Context_Removed (201),
+  Invalid_EAP_Packet (202),
+  Unsupported_Attribute (401),
+  Missing_Attribute (402),
+  NAS_Identification_Mismatch (403),
+  Invalid_Request (404),
+  Unsupported_Service (405),
+  Unsupported_Extension (406),
+  Invalid_Attribute_Value (407),
+  Administratively_Prohibited (501),
+  Request_Not_Routable_Proxy (502),
+  Session_Context_Not_Found (503),
+  Session_Context_Not_Removable (504),
+  Other_Proxy_Processing_Error (505),
+  Resources_Unavailable (506),
+  Request_Initiated (507),
+  Multiple_Session_Selection_Unsupported (508)
+}

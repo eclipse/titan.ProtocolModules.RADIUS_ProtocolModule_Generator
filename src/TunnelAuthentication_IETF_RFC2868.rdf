@@ -1,0 +1,166 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               TunnelAuthenticationIETF_RFC2868.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 2868(RADIUS Attributes for Tunnel Protocol Support)       
+//                       
+//                      
+//
+
+
+// APPLICATION-NAME: Auth
+// APPLICATION-REVISION: RFC2868
+
+
+type enum_24 Tunnel_Type_Value
+{
+  PPTP (1),
+  L2F (2),
+  L2TP (3),
+  ATMP (4),
+  VTP (5),
+  AH (6),
+  IP_IP (7),
+  MIN_IP_IP (8),
+  ESP (9),
+  GRE (10),
+  DVS (11),
+  IP_IP_Tunneling (12)
+}
+  
+// RFC 2868
+// Attrib: Tunnel-Type (64)
+type record Tunnel_Type
+{
+  OCTET1 Tag,
+  Tunnel_Type_Value Value
+}
+
+
+type enum_24 Tunnel_Medium_Type_Value
+{
+  IPv4 (1),
+  IPv6 (2),
+  NSAP (3),
+  HDLC (4),
+  BBN_1822 (5),
+  media_plus_Ethernet_802 (6),
+  Epoint163 (7),
+  Epoint164 (8),
+  Fpoint69 (9),
+  Xpoint121 (10),
+  IPX (11),
+  Appletalk (12),
+  Decnet_IV (13),
+  Banyan_Vines (14),
+  Epoint164_with_NSAP_subaddress (15)
+}
+  
+
+// RFC 2868
+// Attrib: Tunnel-Medium-Type (65)
+type record Tunnel_Medium_Type
+{
+  OCTET1 Tag,
+  Tunnel_Medium_Type_Value Value
+}
+
+
+// RFC 2868
+// Attrib: Tunnel-Client-Endpoint (66)
+type record Tunnel_Client_Endpoint
+{
+  OCTET1 Tag,
+  Attrib_String String
+}
+
+// RFC 2868
+// Attrib: Tunnel-Server-Endpoint (67)
+type record Tunnel_Server_Endpoint
+{
+  OCTET1 Tag,
+  Attrib_String String
+} 
+
+type union Tunnel_Password_String{
+  Tunnel_Password_String_Encrypted encrypted_passwd,
+  Tunnel_Password_String_Plaintext plain_text_passwd
+}
+
+type octetstring Tunnel_Password_String_Encrypted
+
+type record Tunnel_Password_String_Plaintext
+{
+  UINT8         Data_Length,
+  Attrib_String Password,
+  octetstring   Padding_Sub_Field
+} with {
+  variant (Data_Length) "LENGTHTO(Password)"
+}
+
+// RFC 2868
+// Attrib: Tunnel-Password (69)
+type record Tunnel_Password
+{
+  OCTET1 Tag,
+  OCTET2 Salt,
+  Tunnel_Password_String String
+}
+
+// RFC 2868
+// Attrib: Tunnel-Private-Group-ID (81)
+type record Tunnel_Private_Group_ID
+{
+  OCTET1 Tag,
+  Attrib_String String
+}
+
+// RFC 2868
+// Attrib: Tunnel-Assignment-ID (82)
+type record Tunnel_Assignment_ID
+{
+  OCTET1 Tag,
+  Attrib_String String
+}
+
+// RFC 2868
+// Attrib: Tunnel-Preference (83)
+type record Tunnel_Preference
+{
+  OCTET1 Tag,
+  UINT24 Value
+}
+
+// RFC 2868
+// Attrib: Tunnel-Client-Auth-ID (90)
+type record Tunnel_Client_Auth_ID
+{
+  OCTET1 Tag,
+  Attrib_String String
+}
+
+// RFC 2868
+// Attrib: Tunnel-Server-Auth-ID (91)
+type record Tunnel_Server_Auth_ID
+{
+  OCTET1 Tag,
+  Attrib_String String
+}
+

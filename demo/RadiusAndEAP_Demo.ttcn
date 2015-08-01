@@ -1,0 +1,821 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+//
+//  File:               RadiusAndEAP_Demo.ttcn
+//  Rev:                R12A
+//  Prodnr:             CNL 113 600
+//  Remark:             This file is not a part of the product.       
+//                       
+//                      
+//
+
+
+module RadiusAndEAP_Demo {
+
+import from  RADIUSandEAP_Mapping      all;
+import from  UDPasp_PortType    all;
+import from UDPasp_Types      all;
+import from RADIUS_Types   all;
+import from EAP_Types all;
+
+modulepar charstring tsp_addressf := "159.107.193.33";
+modulepar integer tsp_portf := 1100;
+modulepar integer tsp_portf2 := 1101;
+
+modulepar octetstring tsp_s_key := '01234567ABCD'O;
+modulepar octetstring tsp_salt := 'ABCD'O
+
+
+type component RADIUS_MTC
+{
+
+}
+
+type component RADIUSComponent_CT
+{
+  port UDPasp_RADIUS_PT   RADIUS_PORT ;
+}
+
+
+type component SystemComponent 
+{
+  port UDPasp_PT RADIUS_Port;
+  port UDPasp_PT RADIUS_ClientPort;
+  port UDPasp_PT RADIUS_ServerPort;
+}
+
+
+template ASP_UDP_RADIUS t_ASP_UDP_RADIUS(template Code pl_Code,template PDU_EAP pl_PDU_EAP,template PortType pl_port):= 
+
+  { data := { code := pl_Code ,
+              identifier := 1,
+              message_length := 0, 
+              authenticator :=   '00000000000000000000000000000000'O,                                           
+              attributes := {
+                       { genericAttrib:={
+                              attrib_type := Ext_EAP_Message,
+                              attrib_length := 0,
+                              attrib_data:={ext_eap_message := f_enc_PDU_EAP(valueof(pl_PDU_EAP))}}}}},
+     addressf := tsp_addressf, 
+     portf := pl_port }; 
+
+template ASP_UDP_RADIUS tr_ASP_UDP_RADIUS(template Code pl_Code):= 
+
+  { data := { code := pl_Code ,
+              identifier := 1,
+              message_length := ?, 
+              authenticator :=   ?,                                           
+              attributes := ?},
+     addressf := tsp_addressf, 
+     portf := ?}; 
+
+template PDU_EAP t_PDU_EAP_success:={
+  code := success_code, 
+  identifier := 1, 
+  packet_length := 0,
+  packet_data:= omit}; 
+
+template PDU_EAP tr_PDU_EAP_success modifies t_PDU_EAP_success:={
+  packet_length := ?}; 
+
+template PDU_EAP t_PDU_EAP_id (template eap_packet_code_enum pl_code):={
+  code := pl_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_identity,
+      eap_packet_type_data := { 
+        f_eap_identity := '414243444546303132'O}
+    } };
+
+template PDU_EAP tr_PDU_EAP_id (template eap_packet_code_enum pl_code) := {
+  code := pl_code, 
+  identifier := 1, 
+  packet_length := ?, 
+  packet_data := { 
+      eap_packet_type := eap_identity,
+      eap_packet_type_data := { 
+        f_eap_identity := '414243444546303132'O}
+    } };
+
+template PDU_EAP t_PDU_EAP_SIM_versionList:={ 
+  code := request_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_sim,
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          subtype := eap_sim_start, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_version_list := { 
+                attrib := at_version_list, 
+                attrib_length := 0, 
+                actual_length:=0, 
+                version_list := {'0001'O,'0002'O,'0003'O} } 
+            }}}}}
+    } 
+
+template PDU_EAP tr_PDU_EAP_SIM_versionList modifies t_PDU_EAP_SIM_versionList := {
+  packet_length:=?,
+  packet_data := {
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          attrib_list := { 
+            { f_at_version_list := {
+                attrib_length := ?, 
+                actual_length:=? 
+            }}
+    }}}}};
+
+
+template PDU_EAP t_PDU_EAP_SIM_nonceMT_selectedVersion:={ //02010020120A000007050000ABCDEFABCDEFABCDEFABCDEFABCDEFAB10010001
+  code := response_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_sim,
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          subtype := eap_sim_start, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_nonce_mt := { 
+                attrib := at_nonce_mt, 
+                attrib_length := 0, 
+                reserved:='0000'O, 
+                attrib_value := 'ABCDEFABCDEFABCDEFABCDEFABCDEFAB'O }},
+            { f_at_selected_version := { 
+                attrib := at_selected_version, 
+                attrib_length := 0, 
+                attrib_data := '0001'O }}
+ 
+            }}}}
+    } 
+
+template PDU_EAP tr_PDU_EAP_SIM_nonceMT_selectedVersion modifies t_PDU_EAP_SIM_nonceMT_selectedVersion := {
+  packet_length:=?,
+  packet_data := {
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          attrib_list := { 
+            { f_at_nonce_mt := {
+                attrib_length := ? 
+            }},
+            { f_at_selected_version := {
+                attrib_length := ?
+            }}
+    }}}}};
+
+template PDU_EAP t_PDU_EAP_SIM_randIvCounterMac:={
+  code := response_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_sim,
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          subtype := eap_sim_challenge, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_rand := { 
+                attrib := at_rand, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := { '01234567890123456789012345678901'O, '01234567890123456789012345678901'O, '01234567890123456789012345678901'O } 
+              } }, 
+            { f_at_iv := { 
+                attrib := at_iv, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00112233445566778899AABBCCDDEEFF'O 
+              } }, 
+            { f_at_encr_data := { 
+                attrib := at_encr_data, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := { decrypted_attrib_value:=
+                {{ f_at_counter := { 
+                    attrib := at_counter, 
+                    attrib_length := 0, 
+                    attrib_data := '0001'O }}}
+             }} }, 
+            { f_at_mac := { 
+                attrib := at_mac, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O}}
+    }}}}} 
+
+template PDU_EAP tr_PDU_EAP_SIM_randIvCounterMac modifies t_PDU_EAP_SIM_randIvCounterMac := {
+  packet_length:=?,
+  packet_data := {
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          attrib_list := { 
+            { f_at_rand := { 
+                attrib_length := ?
+              } }, 
+            { f_at_iv := { 
+                attrib := at_iv, 
+                attrib_length := ? 
+              } }, 
+            { f_at_encr_data := ?}, 
+            { f_at_mac := { 
+                attrib_length := ?, 
+                 attrib_value := ?}}
+    }}}}};
+
+template PDU_EAP t_PDU_EAP_SIM_mac:={
+  code := response_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_sim,
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          subtype := eap_sim_challenge, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_mac := { 
+                attrib := at_mac, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O } 
+            }}}}}};
+
+template PDU_EAP tr_PDU_EAP_SIM_mac modifies t_PDU_EAP_SIM_mac := {
+  packet_length:=?,
+  packet_data := { 
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+        attrib_list := { 
+            { f_at_mac := { 
+                attrib_length := ?, 
+                attrib_value := ? }}}}}} 
+};
+
+template PDU_EAP t_PDU_EAP_SIM_reauth_ivEncrMac:={
+  code := response_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_sim,
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          subtype := eap_sim_re_authentication, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_iv := { 
+                attrib := at_iv, 
+                attrib_length := 5, 
+                reserved := '0000'O, 
+                attrib_value := '00112233445566778899AABBCCDDEEFF'O 
+              } }, 
+            { f_at_encr_data := { 
+                attrib := at_encr_data, 
+                attrib_length :=0, 
+                reserved := '0000'O, 
+                attrib_value := { decrypted_attrib_value:={
+                { f_at_counter := { 
+                    attrib := at_counter, 
+                    attrib_length := 0, 
+                    attrib_data := '0001'O } },
+                { f_at_nonce_s := { 
+                    attrib := at_nonce_s, 
+                    attrib_length := 0, 
+                    reserved := '0000'O,  
+                    attrib_value := '0123456789abcdef0123456789abcdef'O } },
+                { f_at_next_reauth_id := { 
+                    attrib := at_next_reauth_id, 
+                    attrib_length := 0, 
+                    actual_length := 0,
+                    attrib_value := '1234567890'O } }
+            }} }}, 
+            { f_at_mac := { 
+                attrib := at_mac, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O } 
+            }}}}}};
+
+template PDU_EAP tr_PDU_EAP_SIM_reauth_ivEncrMac modifies t_PDU_EAP_SIM_reauth_ivEncrMac := {
+  packet_length := ?, 
+  packet_data := { 
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          attrib_list := { 
+            { f_at_iv := { 
+                attrib_length := ?
+              } }, 
+            { f_at_encr_data := { 
+                 attrib_length :=?, 
+                reserved := '0000'O, 
+                attrib_value := ?
+            }}, 
+            { f_at_mac := { 
+                attrib_length := ?, 
+                attrib_value := ? } 
+            }}}}}};
+
+template PDU_EAP t_PDU_EAP_SIM_reauth_ivEncrMac2:={
+  code := request_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_sim,
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          subtype := eap_sim_re_authentication, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_iv := { 
+                attrib := at_iv, 
+                attrib_length := 5, 
+                reserved := '0000'O, 
+                attrib_value := 'ABCDEFABCDEFABCDEFABCDEFABCDEFAB'O 
+              } }, 
+            { f_at_encr_data := { 
+                attrib := at_encr_data, 
+                attrib_length :=0, 
+                reserved := '0000'O, 
+                attrib_value := { decrypted_attrib_value:={
+                { f_at_counter := { 
+                    attrib := at_counter, 
+                    attrib_length := 0, 
+                    attrib_data := '0001'O } }
+            }} }}, 
+            { f_at_mac := { 
+                attrib := at_mac, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O } 
+            }}}}}};
+
+template PDU_EAP tr_PDU_EAP_SIM_reauth_ivEncrMac2 modifies t_PDU_EAP_SIM_reauth_ivEncrMac2 := {
+  packet_length := ?, 
+  packet_data := { 
+      eap_packet_type_data := { 
+        f_eap_sim := { 
+          attrib_list := { 
+            { f_at_iv := { 
+                attrib_length := ?
+              } }, 
+            { f_at_encr_data := { 
+                 attrib_length :=?, 
+                reserved := '0000'O, 
+                attrib_value := ?
+            }}, 
+            { f_at_mac := { 
+                attrib_length := ?, 
+                attrib_value := ? } 
+            }}}}}};
+
+template PDU_EAP t_PDU_EAP_AKA_randAutnIvEncrMac:={
+  code := request_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_aka,
+      eap_packet_type_data := { 
+        f_eap_aka := { 
+          subtype := eap_aka_challenge, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_rand := { 
+                attrib := at_rand, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '11223344556677889900AABBCCDDEEFF'O } 
+            }, 
+            { f_at_autn := { 
+                attrib := at_autn, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O } 
+            }, 
+            { f_at_iv := { 
+                attrib := at_iv, 
+                attrib_length := 5, 
+                reserved := '0000'O, 
+                attrib_value := '00112233445566778899AABBCCDDEEFF'O 
+              } }, 
+            { f_at_encr_data := { 
+                attrib := at_encr_data, 
+                attrib_length :=0, 
+                reserved := '0000'O, 
+                attrib_value := { decrypted_attrib_value:=
+                {{ f_at_counter := { 
+                    attrib := at_counter, 
+                    attrib_length := 0, 
+                    attrib_value := '0001'O } }
+            }} }}, 
+            { f_at_mac := { 
+                attrib := at_mac, 
+                attrib_length :=0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O } 
+            } } } } }
+    } 
+
+template PDU_EAP tr_PDU_EAP_AKA_randAutnIvEncrMac modifies t_PDU_EAP_AKA_randAutnIvEncrMac := {
+  packet_length:=?,
+  packet_data := {
+      eap_packet_type_data := { 
+        f_eap_aka := { 
+          attrib_list := { 
+            { f_at_rand := {
+                attrib_length := ? 
+            }},
+            { f_at_autn := {
+                attrib_length := ? ,
+                attrib_value := ?
+            }},
+            { f_at_iv := {
+                attrib_length := ? 
+            }},
+            { f_at_encr_data := {
+                attrib_length := ? ,
+                attrib_value := ? }}, 
+            { f_at_mac := {
+                attrib_length := ? ,
+                attrib_value := ?
+                }}
+            }}
+    }}};
+
+template PDU_EAP t_PDU_EAP_AKA_mac:={
+  code := response_code, 
+  identifier := 1, 
+  packet_length := 0, 
+  packet_data := { 
+      eap_packet_type := eap_aka,
+      eap_packet_type_data := { 
+        f_eap_aka := { 
+          subtype := eap_aka_challenge, 
+          reserved := '0000'O, 
+          attrib_list := { 
+            { f_at_mac := { 
+                attrib := at_mac, 
+                attrib_length := 0, 
+                reserved := '0000'O, 
+                attrib_value := '00000000000000000000000000000000'O } 
+            }}}}}};
+
+template PDU_EAP tr_PDU_EAP_AKA_mac modifies t_PDU_EAP_AKA_mac := {
+  packet_length:=?,
+  packet_data := { 
+      eap_packet_type_data := { 
+        f_eap_aka := { 
+        attrib_list := { 
+            { f_at_mac := { 
+                attrib_length := ?, 
+                attrib_value := ? }}}}}} 
+};
+
+function f_EAP_SIM_full_auth_server() runs on   RADIUSComponent_CT
+{
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS,v_ASP_UDP_RADIUS1,v_ASP_UDP_RADIUS2; 
+ timer t1 := 15.0;
+ t1.start;
+ alt {
+    [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Request)) -> value v_ASP_UDP_RADIUS{
+        var PDU_EAP vl_PDU_EAP:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+        log(v_ASP_UDP_RADIUS);
+        if (match(vl_PDU_EAP,tr_PDU_EAP_id(response_code))){
+          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_SIM_versionList,tsp_portf2)));
+          alt{
+            [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS1{
+               var PDU_EAP vl_PDU_EAP2:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS1.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+               log(v_ASP_UDP_RADIUS1);
+               if (match(vl_PDU_EAP2,tr_PDU_EAP_SIM_nonceMT_selectedVersion)){
+                  RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_SIM_randIvCounterMac,tsp_portf2)));
+                  alt{
+                  []RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS2{
+                    var PDU_EAP vl_PDU_EAP3:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS2.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+                    log(v_ASP_UDP_RADIUS2);
+                    if (match(vl_PDU_EAP3,tr_PDU_EAP_SIM_mac)){
+                          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Accept,t_PDU_EAP_success,tsp_portf2)));
+                          setverdict (pass)}
+                      else {setverdict (fail); repeat;}}
+                  [] t1.timeout {setverdict (fail)}
+                  }}}
+            [] t1.timeout {setverdict (fail)}
+          }
+          }}
+     [] t1.timeout {setverdict (fail)}
+    }  
+}
+
+
+function f_EAP_SIM_full_auth_client() runs on   RADIUSComponent_CT
+{
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1,v_ASP_UDP_RADIUS2;
+
+  RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Request,t_PDU_EAP_id(response_code),tsp_portf)));
+  timer t1 := 15.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS1{
+        var PDU_EAP vl_PDU_EAP:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS1.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+        log(v_ASP_UDP_RADIUS1);
+        if (match(vl_PDU_EAP,tr_PDU_EAP_SIM_versionList)){
+          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_SIM_nonceMT_selectedVersion,tsp_portf)));
+          alt{
+            []RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS2{
+              var PDU_EAP vl_PDU_EAP2:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS2.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+              log(v_ASP_UDP_RADIUS2);
+              if (match(vl_PDU_EAP2,tr_PDU_EAP_SIM_randIvCounterMac)){
+                RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_SIM_mac,tsp_portf)));
+                alt{
+                []RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Accept)) {
+                  setverdict (pass)}
+                [] t1.timeout {setverdict (fail)}
+              }}}
+            [] t1.timeout {setverdict (fail)}
+              }}}
+     [] t1.timeout {setverdict (fail)}
+    }
+
+}
+
+
+function f_EAP_SIM_reauth_server() runs on   RADIUSComponent_CT
+{
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS,v_ASP_UDP_RADIUS1,v_ASP_UDP_RADIUS2; 
+ timer t1 := 15.0;
+ t1.start;
+ alt {
+    [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Request)) -> value v_ASP_UDP_RADIUS{
+        var PDU_EAP vl_PDU_EAP:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+        log(v_ASP_UDP_RADIUS);
+        if (match(vl_PDU_EAP,tr_PDU_EAP_id(response_code))){
+          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_SIM_reauth_ivEncrMac,tsp_portf2)));
+          alt{
+            [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS1{
+               var PDU_EAP vl_PDU_EAP2:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS1.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+               log(v_ASP_UDP_RADIUS1);
+               if (match(vl_PDU_EAP2,tr_PDU_EAP_SIM_reauth_ivEncrMac2)){
+                           RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Accept,t_PDU_EAP_success,tsp_portf2)));
+                          setverdict (pass)}
+               else {setverdict (fail); }}
+            [] t1.timeout {setverdict (fail)}
+          }
+          }}
+     [] t1.timeout {setverdict (fail)}
+    }  
+}
+
+
+function f_EAP_SIM_reauth_client() runs on   RADIUSComponent_CT
+{
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1,v_ASP_UDP_RADIUS2;
+
+  RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Request,t_PDU_EAP_id(response_code),tsp_portf)));
+  timer t1 := 15.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS1{
+        var PDU_EAP vl_PDU_EAP:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS1.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+        log(v_ASP_UDP_RADIUS1);
+        if (match(vl_PDU_EAP,tr_PDU_EAP_SIM_reauth_ivEncrMac)){
+          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_SIM_reauth_ivEncrMac2,tsp_portf)));
+          alt{
+          []RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Accept)) {
+            setverdict (pass)}
+          [] t1.timeout {setverdict (fail)}
+        }}}
+     [] t1.timeout {setverdict (fail)}
+    }
+
+}
+
+
+function f_EAP_AKA_full_auth_server() runs on   RADIUSComponent_CT
+{
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1,v_ASP_UDP_RADIUS2; 
+ timer t1 := 15.0;
+ t1.start;
+ alt {
+    [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Request)) -> value v_ASP_UDP_RADIUS1{
+        var PDU_EAP vl_PDU_EAP:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS1.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+        log(v_ASP_UDP_RADIUS1);
+        if (match(vl_PDU_EAP,tr_PDU_EAP_id(response_code))){
+          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_AKA_randAutnIvEncrMac,tsp_portf2)));
+          alt{
+            [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS2{
+               var PDU_EAP vl_PDU_EAP2:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS2.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+               if (match(vl_PDU_EAP2,tr_PDU_EAP_AKA_mac)){
+                  RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Accept,t_PDU_EAP_success,tsp_portf2)));
+                  setverdict (pass);
+              }}
+            [] t1.timeout {setverdict (fail)}
+          }
+          }
+        }
+     [] t1.timeout {setverdict (fail)}
+    }
+
+}
+
+function f_EAP_AKA_full_auth_client() runs on   RADIUSComponent_CT
+{
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1; 
+
+  RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Request,t_PDU_EAP_id(response_code),tsp_portf)));
+  timer t1 := 15.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Challenge)) -> value v_ASP_UDP_RADIUS1{
+        var PDU_EAP vl_PDU_EAP:=f_dec_PDU_EAP(v_ASP_UDP_RADIUS1.data.attributes[0].genericAttrib.attrib_data.ext_eap_message);
+        log(v_ASP_UDP_RADIUS1);
+        if (match(vl_PDU_EAP,tr_PDU_EAP_AKA_randAutnIvEncrMac))
+        {
+          RADIUS_PORT.send(valueof(t_ASP_UDP_RADIUS(Access_Challenge,t_PDU_EAP_AKA_mac,tsp_portf)));
+          alt{
+            []RADIUS_PORT.receive(tr_ASP_UDP_RADIUS(Access_Accept)) {
+                 setverdict (pass)
+               }
+            [] t1.timeout {setverdict (fail)}
+              }}
+        }
+     [] t1.timeout {setverdict (fail)}
+    }
+
+}
+
+/////////////////////////
+testcase tc_RADIUS_EAP_AKA_full_authentication() runs on RADIUS_MTC system SystemComponent {
+
+  var RADIUSComponent_CT client := RADIUSComponent_CT.create;
+  var RADIUSComponent_CT server := RADIUSComponent_CT.create;
+
+  var RADIUS_mapping_CT mappingServer := RADIUS_mapping_CT.create;
+  var RADIUS_mapping_CT mappingClient := RADIUS_mapping_CT.create;
+
+  connect(client: RADIUS_PORT , mappingClient:UDP_RADIUS_PCO);
+  map(mappingClient:UDP_PCO, system: RADIUS_ClientPort);
+
+  connect(server: RADIUS_PORT , mappingServer:UDP_RADIUS_PCO);
+  map(mappingServer:UDP_PCO, system: RADIUS_ServerPort);
+
+  var EAP_port_descriptor v_EAP_port_descriptor_Server,v_EAP_port_descriptor_Client;
+  f_initEAPPortDescriptor(v_EAP_port_descriptor_Server);
+//  f_set_K(1,tsp_AKA_K,v_EAP_port_descriptor_Server);
+  f_initEAPPortDescriptor(v_EAP_port_descriptor_Client);
+//  f_set_K(1,tsp_AKA_K,v_EAP_port_descriptor_Client);
+//  f_set_SQN(1,tsp_AKA_SQN,v_EAP_port_descriptor_Server);
+//  f_set_SQN_MS(1,tsp_AKA_SQN_MS,v_EAP_port_descriptor_Server);
+//  f_set_AMF(1,tsp_AKA_AMF,v_EAP_port_descriptor_Server);
+
+  mappingServer.start(f_RADIUS_EncDec_Start(server,v_EAP_port_descriptor_Server))
+  server.start(f_EAP_AKA_full_auth_server());
+  mappingClient.start(f_RADIUS_EncDec_Start(client,v_EAP_port_descriptor_Client))
+  client.start(f_EAP_AKA_full_auth_client());
+    
+    timer t1 := 15.0;
+    t1.start;
+    
+    alt {
+    []  server.done {
+      alt {
+        [] client.done {
+          setverdict (pass);
+        }
+        [] t1.timeout {
+          setverdict (fail);
+        }
+      }
+      }
+    []  t1.timeout {
+      setverdict(fail);
+    }
+    }
+  unmap(mappingClient:UDP_PCO, system: RADIUS_ClientPort);
+  unmap(mappingServer:UDP_PCO, system: RADIUS_ServerPort);
+    
+}
+
+
+
+/////////////////////////
+testcase tc_RADIUS_EAP_SIM_full_authentication() runs on RADIUS_MTC system SystemComponent {
+
+  var RADIUSComponent_CT client := RADIUSComponent_CT.create;
+  var RADIUSComponent_CT server := RADIUSComponent_CT.create;
+
+  var RADIUS_mapping_CT mappingServer := RADIUS_mapping_CT.create;
+  var RADIUS_mapping_CT mappingClient := RADIUS_mapping_CT.create;
+
+  var EAP_port_descriptor v_EAP_port_descriptor_Server,v_EAP_port_descriptor_Client;
+  f_initEAPPortDescriptor(v_EAP_port_descriptor_Server);
+  f_initEAPPortDescriptor(v_EAP_port_descriptor_Client);
+  f_set_Ki(1,tsp_SIM_Ki,v_EAP_port_descriptor_Server);
+  f_set_Ki(1,tsp_SIM_Ki,v_EAP_port_descriptor_Client);
+
+  connect(client: RADIUS_PORT , mappingClient:UDP_RADIUS_PCO);
+  map(mappingClient:UDP_PCO, system: RADIUS_ClientPort);
+
+  connect(server: RADIUS_PORT , mappingServer:UDP_RADIUS_PCO);
+  map(mappingServer:UDP_PCO, system: RADIUS_ServerPort);
+
+  mappingServer.start(f_RADIUS_EncDec_Start(server,v_EAP_port_descriptor_Server));
+  server.start(f_EAP_SIM_full_auth_server());
+  mappingClient.start(f_RADIUS_EncDec_Start(client,v_EAP_port_descriptor_Client));
+  client.start(f_EAP_SIM_full_auth_client());
+    
+    timer t1 := 15.0;
+    t1.start;
+    
+    alt {
+    []  server.done {
+      alt {
+        [] client.done {
+          setverdict (pass);
+        }
+        [] t1.timeout {
+          setverdict (fail);
+        }
+      }
+      }
+    []  t1.timeout {
+      setverdict(fail);
+    }
+    }
+  unmap(mappingClient:UDP_PCO, system: RADIUS_ClientPort);
+  unmap(mappingServer:UDP_PCO, system: RADIUS_ServerPort);
+    
+}
+
+/////////////////////////
+testcase tc_RADIUS_EAP_SIM_reauthentication() runs on RADIUS_MTC system SystemComponent {
+
+  var RADIUSComponent_CT client := RADIUSComponent_CT.create;
+  var RADIUSComponent_CT server := RADIUSComponent_CT.create;
+
+  var RADIUS_mapping_CT mappingServer := RADIUS_mapping_CT.create;
+  var RADIUS_mapping_CT mappingClient := RADIUS_mapping_CT.create;
+
+  var EAP_port_descriptor v_EAP_port_descriptor_Server,v_EAP_port_descriptor_Client;
+  f_initEAPPortDescriptor(v_EAP_port_descriptor_Server);
+  f_initEAPPortDescriptor(v_EAP_port_descriptor_Client);
+  f_set_Ki(1,tsp_SIM_Ki,v_EAP_port_descriptor_Server);
+  f_set_Ki(1,tsp_SIM_Ki,v_EAP_port_descriptor_Client);
+
+  connect(client: RADIUS_PORT , mappingClient:UDP_RADIUS_PCO);
+  map(mappingClient:UDP_PCO, system: RADIUS_ClientPort);
+
+  connect(server: RADIUS_PORT , mappingServer:UDP_RADIUS_PCO);
+  map(mappingServer:UDP_PCO, system: RADIUS_ServerPort);
+
+  mappingServer.start(f_RADIUS_EncDec_Start(server,v_EAP_port_descriptor_Server))
+  server.start(f_EAP_SIM_reauth_server());
+  mappingClient.start(f_RADIUS_EncDec_Start(client,v_EAP_port_descriptor_Client))
+  client.start(f_EAP_SIM_reauth_client());
+    
+    timer t1 := 15.0;
+    t1.start;
+    
+    alt {
+    []  server.done {
+      alt {
+        [] client.done {
+          setverdict (pass);
+        }
+        [] t1.timeout {
+          setverdict (fail);
+        }
+      }
+      }
+    []  t1.timeout {
+      setverdict(fail);
+    }
+    }
+  unmap(mappingClient:UDP_PCO, system: RADIUS_ClientPort);
+  unmap(mappingServer:UDP_PCO, system: RADIUS_ServerPort);
+    
+}
+
+control
+{
+  execute(tc_RADIUS_EAP_SIM_full_authentication());
+  execute(tc_RADIUS_EAP_SIM_reauthentication());
+  execute(tc_RADIUS_EAP_AKA_full_authentication());
+}
+
+}

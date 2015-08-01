@@ -1,0 +1,161 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Scap.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:                
+//                       
+//                      
+
+// Vendor: scap           (10923)
+
+
+type enum_8 scap_type_enum
+{
+  requested_service_unit        (1),
+  used_service_unit             (2),
+  granted_service_unit          (3),
+  unit_type                     (4),
+  unit_value                    (5),
+  value_digits                  (6),
+  exponent                      (7),
+  currency_code                 (8),
+  subscription_id               (9),
+  additional_subscription_id    (10),
+  subscription_id_type          (11),
+  subscription_id_data          (12),
+  event_timestamp               (13),
+  accounting_record_number      (14),
+  result_code                   (15),
+  accounting_interim_interval   (16),
+  origin_state_id               (17),
+  suggested_primary_rulespace   (30),
+  suggested_secondary_rulespace (31),
+  access_control_group_id       (33),
+  authorization_code            (34),
+  mobile_assisted_service_classification (35)
+} 
+
+
+type enum_8 scap_unit_type_enum {
+  SERVICE_CREDIT_TIME     (0),
+  SERVICE_CREDIT_VOLUME   (1),
+  SERVICE_CREDIT_EVENT    (2),
+  SERVICE_CREDIT_MONEY    (3)
+} 
+
+
+type enum_8 scap_subsription_id_type_enum {
+  END_USER_MSISDN   (0),
+  END_USER_IMSI     (1),
+  END_USER_SIP_URL  (2),
+  END_USER_NAI      (3),
+  END_USER_PRIVATE  (4)
+} 
+
+type record scap_unit_type_t {
+  scap_type_enum      scap_type,
+  UINT8               scap_length,
+  INT32             scap_val
+} with {
+    variant (scap_length) "LENGTHTO(scap_type, scap_length, scap_val)"
+}
+
+type set of scap_unit_type_t unit_value_list;
+
+type union unit_value_t
+{
+  octetstring                   string_val,
+  scap_unit_type_enum           unit_type_val,
+  scap_subsription_id_type_enum subsription_id_type_val,
+  unit_value_list               unit_type_list,
+  INT32                       integer_val,
+  charstring                    unichar_val
+} 
+
+
+type record service_unit_t {
+  scap_type_enum        scap_type,
+  UINT8                 scap_length,
+  unit_value_t          scap_val
+} with {
+  variant (scap_length) "LENGTHTO(scap_type, scap_length, scap_val)";
+  variant (scap_val) "CROSSTAG(
+  unit_type_val,           scap_type=unit_type;
+  unit_type_list,          scap_type=unit_value;
+  integer_val,             scap_type=value_digits;
+  integer_val,             scap_type=exponent;
+  integer_val,             scap_type=currency_code;
+  unit_type_list,          scap_type=subscription_id;
+  integer_val,             scap_type=additional_subscription_id;
+  subsription_id_type_val, scap_type=subscription_id_type;
+  unichar_val,             scap_type=subscription_id_data;
+  integer_val,             scap_type=event_timestamp;
+  integer_val,             scap_type=accounting_record_number;
+  integer_val,             scap_type=result_code;
+  integer_val,             scap_type=accounting_interim_interval;
+  integer_val,             scap_type=origin_state_id)"
+ }
+
+
+type set of service_unit_t service_unit_list;
+
+
+type union scap_value {
+  octetstring                   string_val,
+  scap_unit_type_enum           unit_type_val,
+  unit_value_list               unit_type_list,
+  service_unit_list             f_service_unit_list,
+  scap_subsription_id_type_enum subscription_id_type_val,
+  INT32                       integer_val,
+  charstring                    unichar_val,
+  charstring                    charstring_val
+}  
+
+
+type record scap_subattr_t {
+  scap_type_enum      scap_type,
+  UINT8               scap_length,
+  scap_value          scap_val
+} with {
+  variant (scap_length) "LENGTHTO(scap_type, scap_length, scap_val)";
+  variant (scap_val) "CROSSTAG(
+    f_service_unit_list,      scap_type=requested_service_unit;
+    f_service_unit_list,      scap_type=used_service_unit;
+    f_service_unit_list,      scap_type=granted_service_unit;
+    unit_type_val,            scap_type=unit_type;
+    unit_type_list,           scap_type=unit_value;
+    integer_val,              scap_type=value_digits;
+    integer_val,              scap_type=exponent;
+    integer_val,              scap_type=currency_code;
+    f_service_unit_list,      scap_type=subscription_id;
+    integer_val,              scap_type=additional_subscription_id;
+    subscription_id_type_val, scap_type=subscription_id_type;
+    unichar_val,              scap_type=subscription_id_data;
+    integer_val,              scap_type=event_timestamp;
+    integer_val,              scap_type=accounting_record_number;
+    integer_val,              scap_type=result_code;
+    integer_val,              scap_type=accounting_interim_interval;
+    integer_val,              scap_type=origin_state_id;
+    charstring_val,           scap_type=suggested_primary_rulespace;
+    charstring_val,           scap_type=suggested_secondary_rulespace)"
+  }
+
+type set of scap_subattr_t scap_subattr_list;
+

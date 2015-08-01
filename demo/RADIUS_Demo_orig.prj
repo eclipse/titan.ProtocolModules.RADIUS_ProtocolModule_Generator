@@ -1,0 +1,60 @@
+<!DOCTYPE TITAN_GUI_project_file>
+<Project TITAN_version="1.8.pl2" >
+    <General>
+        <Project_Name>RADIUS_Demo_orig</Project_Name>
+        <Executable_Path>myTest</Executable_Path>
+        <Working_Dir>.</Working_Dir>
+        <Build_Host>alpha</Build_Host>
+        <Execution_Mode>Parallel</Execution_Mode>
+        <Code_Splitting_Mode>None</Code_Splitting_Mode>
+        <ScriptFile_AfterMake>gui_make_RPMG_orig.sh</ScriptFile_AfterMake>
+        <Log_Format>yes</Log_Format>
+        <Update_Symlinks>yes</Update_Symlinks>
+        <Create_Absolute_Symlinks>no</Create_Absolute_Symlinks>
+        <Update_Makefile>yes</Update_Makefile>
+        <Localhost_Execute>yes</Localhost_Execute>
+        <Execute_Command>rsh %host &quot;cd %project_working_dir ; &quot;%executable&quot; %localhost %mctr_port&quot;</Execute_Command>
+        <Execute_Hosts>alfa, beta, gamma</Execute_Hosts>
+        <UnUsed_List></UnUsed_List>
+    </General>
+    <Modules>
+        <Module>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_PortType.ttcn</Module>
+        <Module>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_Types.ttcn</Module>
+        <Module>RADIUS_Mapping_orig.ttcn</Module>
+        <Module>Radius_Test_orig.ttcn</Module>
+    </Modules>
+    <TestPorts>
+        <TestPort>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_PT.cc</TestPort>
+        <TestPort>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_PT.hh</TestPort>
+    </TestPorts>
+    <Other_Sources>
+        <Other_Source>../src/RADIUS_EncDec.cc</Other_Source>
+    </Other_Sources>
+    <Configs>
+        <Config>radius.cfg</Config>
+    </Configs>
+    <Test_Cases>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_server_receiveAccessRequest_sendAccessAccept_with_correct_auth</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_server_receiveAccessRequest_sendAccessAccept_with_incorrect_auth</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_client_sendAccessRequest</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_client_sendAccessRequest_receiveAccessAccept</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_client_sendAccessAccept</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_client_sendAccountingRequest_receiveAccountingResponse</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_server_receiveAccessRequest_sendAccessAccept</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_server_receiveAccessRequest_sendAccessChallenge</Test_Case>
+        <Test_Case>Radius_Test_orig.tc_RADIUS_server_receiveAccountingRequest_sendAccountingResponse</Test_Case>
+    </Test_Cases>
+    <Others>
+        <Other>gui_make_RPMG_orig.sh</Other>
+        <Other>../src/ATTR.awk</Other>
+        <Other>../src/IPv6_IETF_RFC3162.rdf</Other>
+        <Other>../src/Base_IETF_RFC2865.rdf</Other>
+        <Other>../src/BaseTypes_IETF_RFC2865.rdf</Other>
+        <Other>../src/Extensions_IETF_RFC2869.rdf</Other>
+        <Other>../src/TunnelAuthentication_IETF_RFC2868.rdf</Other>
+        <Other>../src/Extensions_IETF_RFC2869.rdf</Other>
+        <Other>../src/GGSN_FS_46_15517_CSA113_35_4RevB.rdf</Other>
+        <Other>../src/Accounting_IETF_RFC2866_RFC2867.rdf</Other>
+    </Others>
+    <File_Group name="MainFileGroup" />
+</Project>

@@ -1,0 +1,326 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Vendor.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:                
+//                       
+//                      
+
+// Vendor: ericsson (193)
+
+type enum_8 ericsson_type_enum
+{
+  product_profile                  (1),
+  digest_response                 (14),
+  digest_attributes               (15),
+  pmk                             (17),
+  layer_identity                  (34),
+  major_protocol_version          (35),
+  minor_protocol_version          (36),
+  ipt_timestamp                  (126),
+  master_session_id              (200),
+  message_from_sn                (202),
+  requested_url                  (203),
+  authorization_result_code      (204),
+  cds_uid                        (205),
+  msisdn                         (206),
+  authentication_type            (207),
+  timestamp_created              (208),
+  timestamp_used                 (209),
+  access_type                    (210),
+  requested_service_id           (211),
+  user_alias                     (212),
+  service_session_id             (213)
+} 
+
+type record ericsson_type
+{
+  ericsson_type_enum              f_ericsson_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_ericsson_type, attrib_length_spec, string_val)"
+  }
+
+type set of ericsson_type ericsson_subattr_list;
+
+// Vendor: acc (5)
+type enum_8 acc_type_enum
+{
+  acc_error_message           (1),
+  acc_ccp_option              (2),
+  acc_customer_id             (6),
+  acc_tunnel_secret          (14),
+  acc_service_profile        (17),
+  acc_request_type           (18),
+  acc_dns_server_pri         (23),
+  acc_dns_server_sec         (24),
+  acc_nbns_server_pri        (25),
+  acc_nbns_server_sec        (26),
+  acc_dial_port_index        (27),
+  acc_mn_ha_shared_secret    (73),
+  acc_mip_spi                (74)
+} 
+
+type record acc_type
+{
+  acc_type_enum                   f_acc_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_acc_type, attrib_length_spec, string_val)"
+  }
+
+type set of acc_type acc_subattr_list;
+
+// Vendor: microsoft (311)
+
+type enum_8 microsoft_type_enum
+{
+  microsoft_chap_mppe_keys    (12),
+  microsoft_mppe_send_key     (16),
+  microsoft_mppe_recv_key     (17),
+  microsoft_primary_dns_server   (28),
+  microsoft_secondary_dns_server (29),
+  microsoft_primary_nbns_server   (30),
+  microsoft_secondary_nbns_server (31)
+} 
+
+type record microsoft_type
+{
+  microsoft_type_enum             f_microsoft_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_microsoft_type, attrib_length_spec, string_val)"
+  }
+
+type set of microsoft_type microsoft_subattr_list;
+
+// Vendor: cdma2000 (5535)
+
+type enum_8 cdma2000_type_enum
+{
+  ike_pre_shared_secret_request    (1),
+  security_level                   (2),
+  pre_shared_secret                (3),
+  reverse_tunnel_specification     (4),
+  differentiated_services_class    (5),
+  container                        (6),
+  home_agent                       (7),
+  key_id                           (8),
+  pcf_ip_addr                      (9),
+  bs_msc_addr                     (10),
+  userid                          (11),
+  forward_mux                     (12),
+  reverse_mux                     (13),
+  forward_fundamental_rate        (14),
+  reverse_fundamental_rate        (15),
+  service_option                  (16),
+  forward_traffic_type            (17),
+  reverse_traffic_type            (18),
+  fundamental_frame_size          (19),
+  forward_fundamental_rc          (20),
+  reverse_fundamental_rc          (21),
+  ip_technology                   (22),
+  compulsory_tunnel_indicator     (23),
+  release_indicator               (24),
+  bad_frame_count                 (25),
+  num_active                      (30),
+  sdb_input_octects               (31),
+  sdb_output_octects              (32),
+  numsdb_input                    (33),
+  numsdb_output                   (34),
+  ip_QoS                          (36),
+  air_QoS                         (39),
+  airlink_record_type             (40),
+  rp_session_id                   (41),
+  airlink_secuence_number         (42),
+  num_bytes_received_total        (43),
+
+  correlation_id                  (44),
+  mo_mt_indicator                 (45),
+  mobile_ip_sig_inbound_count     (46),
+  mobile_ip_sig_outbound_count    (47),
+  session_cont                    (48),
+  active_time                     (49),
+  dcch_frame_format               (50),
+  ESN                             (52),
+  s_key                           (54),
+  s_request                       (55),
+  s_lifetime                      (56),
+  mn_ha_shared_secret_request     (57),
+  mn_ha_shared_secret             (58),
+  remote_ipv4_address             (59),
+  hrpd_access_authentication      (60),
+
+  remote_ipv6_address             (70),
+  remote_address_table_index      (71),
+  remote_address_octet_count      (72),
+  always_on                       (78),
+  last_user_activity_time         (80),
+
+  session_termination_capability  (88),
+  prepaid_accounting_quota        (90),
+  prepaid_accounting_capability   (91),
+  mip_rrq_lifetime                (92),
+  service_reference_id            (94),
+  disconnect_reason               (96),
+  cdma2000_error_cause           (255) // WARNING: temporary type number, not yet standardized 2003-06-17 tmptso
+} 
+
+type record cdma2000_type
+{
+  cdma2000_type_enum              f_cdma2000_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_cdma2000_type, attrib_length_spec,string_val)"
+  }
+
+type set of cdma2000_type cdma2000_subattr_list;
+
+// Vendor: threegpp (10415)
+
+type enum_8 threegpp_type_enum
+{
+  threegpp_imsi                           (1),
+  threegpp_charging_id                    (2),
+  threegpp_pdp_type                       (3),
+  threegpp_charging_gateway_address       (4),
+  threegpp_gprs_negotiated_qos_profile    (5),
+  threegpp_sgsn_ip_address                (6),
+  threegpp_ggsn_ip_address                (7),
+  threegpp_imsi_mcc_mnc                   (8),
+  threegpp_ggsn_mcc_mnc                   (9),
+  threegpp_nsapi                         (10),
+  threegpp_session_stop_indicator        (11),
+  threegpp_selection_mode                (12),
+  threegpp_charging_characteristics      (13),
+  threegpp_cg_ipv6_address               (14),
+  threegpp_sgsn_ipv6_address             (15),
+  threegpp_ggsn_ipv6_address             (16),
+  threegpp_ipv6_dns_servers              (17),
+  threegpp_sgsn_mcc_mnc                  (18),
+  threegpp_teardown_indicator            (19),
+  threegpp_imeisv                        (20),
+  threegpp_rat_type                      (21),
+  threegpp_user_location_info            (22),
+  threegpp_ms_timezone                   (23),
+  threegpp_camel_charging_info           (24),
+  threegpp_packet_filter                 (25),
+  threegpp_negotiated_dscp               (26),
+  threegpp_allocate_ip_type              (27),
+  threegpp_chargeable_user_identity      (89) // FIXME no standard reference available ETIBSZA
+} 
+
+
+type record threegpp_type
+{
+  threegpp_type_enum              f_threegpp_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_threegpp_type, attrib_length_spec, string_val)"
+  }
+
+type set of threegpp_type threegpp_subattr_list;
+
+// Vendor: servicefactory  (5556)
+
+type enum_8 servicefactory_type_enum
+{
+  servicefactory_product_profile_id    (1),
+  servicefactory_access_point_id       (7),
+  servicefactory_apn                  (14) // FIXME no standard reference available ETIBSZA
+} 
+
+type record servicefactory_type
+{
+  servicefactory_type_enum        f_servicefactory_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_servicefactory_type, attrib_length_spec, string_val)"
+  }
+
+type set of servicefactory_type servicefactory_subattr_list;
+
+// Vendor: adslforum       (3561)
+
+type enum_8 adslforum_type_enum
+{
+  adslforum_agent_circuit_id (1)
+} 
+
+
+type record adslforum_type
+{
+  adslforum_type_enum             f_adslforum_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_adslforum_type, attrib_length_spec, string_val)"
+  }
+
+type set of adslforum_type adslforum_subattr_list;
+
+// Vendor: wispr          (14122)
+type enum_8 wispr_type_enum
+{
+  wispr_location_id (1),
+  wispr_location_name(2)
+} 
+
+
+type record wispr_type
+{
+  wispr_type_enum                 f_wispr_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_wispr_type, attrib_length_spec, string_val)"
+  }
+
+type set of wispr_type wispr_subattr_list;
+
+
+// Vendor: chinatel       (20942)
+
+type enum_8 chinatel_type_enum
+{
+  chinatel_served_mdn (100)
+} 
+
+
+type record chinatel_type
+{
+  chinatel_type_enum              f_chinatel_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_chinatel_type, attrib_length_spec, string_val)"
+  }
+
+type set of chinatel_type chinatel_subattr_list;
+
+
+
+

@@ -1,0 +1,133 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Cisco.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:                
+//                       
+//                      
+
+// Vendor: cisco (9)
+
+type record cisco_type
+{
+  cisco_type_enum                 f_cisco_type,
+  UINT8                           attrib_length_spec,
+  vendor_specific_value           string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_cisco_type, attrib_length_spec, string_val)"
+  variant (string_val) "CROSSTAG(
+    integer_val, {f_cisco_type=multilink_id,
+                  f_cisco_type=num_in_multilink,
+                  f_cisco_type=pre_input_octets,
+                  f_cisco_type=pre_output_octets,
+                  f_cisco_type=pre_input_packets,
+                  f_cisco_type=pre_output_packets,
+                  f_cisco_type=maximum_time,
+                  f_cisco_type=disconnect_cause,
+                  f_cisco_type=date_rate,
+                  f_cisco_type=presession_time,
+                  f_cisco_type=pw_limetime,
+                  f_cisco_type=ip_direct,
+                  f_cisco_type=ppp_vj_slot_comp,
+                  f_cisco_type=ppp_async_map,
+                  f_cisco_type=ip_pool_definition,
+                  f_cisco_type=asing_ip_pool,
+                  f_cisco_type=route_ip,
+                  f_cisco_type=link_compression,
+                  f_cisco_type=target_util,
+                  f_cisco_type=maximum_channels,
+                  f_cisco_type=data_filter,
+                  f_cisco_type=call_filter,
+                  f_cisco_type=idle_limit,
+                  f_cisco_type=xmit_rate
+                 };
+    unsalted_string, f_cisco_type=li_configuration;
+    string_val, OTHERWISE
+  )"
+}
+
+type set of cisco_type cisco_subattr_list;
+
+type enum_8  cisco_type_enum
+{
+  cisco_avpair              (1),//cisco_access_control_list
+  cisco_nas_port            (2),
+  h323_remote_address      (23),
+  h323_conf_id             (24),
+  h323_setup_time          (25),
+  h323_call_orign          (26),
+  h323_call_type           (27),
+  h323_connect_time        (28),
+  h323_disconnect_time     (29),
+  h323_disconnect_cause    (30),
+  h323_voice_quality       (31),
+  h323_ivr_out             (32),
+  h323_gw_id               (33),
+  h323_call_treatment      (34),
+  h323_incoming_conf_id    (35),
+  li_configuration         (36),
+  policy_up                (37), 
+  policy_down              (38),//sub_policy_out
+  vpnpassword              (66),
+  vpngroupinfo             (67),
+  h323_ivr_in             (100),
+  h323_credit_amount      (101),
+  h323_credit_time        (102),
+  h323_return_code        (103),
+  h323_prompt_id          (104),
+  h323_time_and_day       (105),
+  h323_redirect_number    (106),
+  h323_preferred_lang     (107),
+  h323_redirect_ip_addr   (108),
+  h323_billing_model      (109),
+  h323_currency_type      (110),
+  multilink_id            (187),
+  num_in_multilink        (188),
+  pre_input_octets        (190),
+  pre_output_octets       (191),
+  pre_input_packets       (192),
+  pre_output_packets      (193),
+  maximum_time            (194),
+  disconnect_cause        (195),
+  date_rate               (197),
+  presession_time         (198),
+  pw_limetime             (208),
+  ip_direct               (209),
+  ppp_vj_slot_comp        (210),
+  ppp_async_map           (212),
+  ip_pool_definition      (217),
+  asing_ip_pool           (218),
+  route_ip                (228),
+  link_compression        (233),
+  target_util             (234),
+  maximum_channels        (235),
+  data_filter             (242),
+  call_filter             (243),
+  idle_limit              (244),
+  account_info            (250),//cisco_info_service,cisco_account_info
+  service_info            (251),//cisco_service_list,ssg_service_info
+  command_code            (252),//cisco_n_service_info
+  control_info            (253), //cisco_byte_count,ssg_control_info
+  xmit_rate               (255)
+}
+
+
+
+

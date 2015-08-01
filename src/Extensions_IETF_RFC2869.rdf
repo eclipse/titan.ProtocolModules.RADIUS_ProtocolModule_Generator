@@ -1,0 +1,125 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Extensions_IETF_RFC2869.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 2869(RADIUS Extensions)       
+//                       
+//                      
+//
+
+
+// APPLICATION-NAME: Ext
+// APPLICATION-REVISION: RFC2869
+
+// RFC 2869
+// Attrib: Acct-Input-Gigawords (52)
+type Attrib_Value Acct_Input_Gigawords;
+
+// RFC 2869
+// Attrib: Acct-Output-Gigawords (53)
+type Attrib_Value Acct_Output_Gigawords;
+
+// RFC 2869
+// Attrib: Event-Timestamp (55)
+type Attrib_Value Event_Timestamp;
+
+// RFC 2869
+// Attrib: ARAP-Password (70)
+type record ARAP_Password
+{
+  Attrib_Value Value1,
+  Attrib_Value Value2,
+  Attrib_Value Value3,
+  Attrib_Value Value4
+}
+
+// RFC 2869
+// Attrib: ARAP-Features (71)
+type record ARAP_Features
+{
+  UINT8 variable_password,
+  UINT8 password_length,
+  Attrib_Time creation_time,
+  Attrib_Value expiration_time,
+  Attrib_Time radius_time
+}
+
+// RFC 2869
+// Attrib: ARAP-Zone-Access (72)
+type enumerated ARAP_Zone_Access
+{
+  To_default_zone (1),
+  Use_zone_filter_inclusively (2),
+  Use_zone_filter_exclusively (3)
+}
+
+// RFC 2869
+// Attrib: ARAP-Security (73)
+type Attrib_Value ARAP_Security;
+
+// RFC 2869
+// Attrib: ARAP-Security-Data (74)
+type Attrib_String ARAP_Security_Data;
+
+// RFC 2869
+// Attrib: Password-Retry (75)
+type Attrib_Value Password_Retry;
+
+// RFC 2869
+// Attrib: Prompt (76)
+type enumerated Prompt
+{
+  No_Echo (0),
+  Echo (1)
+}
+
+// RFC 2869
+// Attrib: Connect-Info (77)
+type Attrib_Text Connect_Info;
+
+// RFC 2869
+// Attrib: Configuration-Token (78)
+type Attrib_String Configuration_Token;
+
+// RFC 2869
+// Attrib: EAP-Message (79)
+type Attrib_String EAP_Message;
+
+// RFC 2869
+// Attrib: Message-Authenticator (80)
+type Attrib_String Message_Authenticator;
+
+// RFC 2869
+// Attrib: ARAP-Challenge-Response (84)
+type UINT64 ARAP_Challenge_Response;
+
+// RFC 2869
+// Attrib: Acct-Interim-Interval (85)
+type Attrib_Value Acct_Interim_Interval;
+
+// RFC 2869
+// Attrib: NAS-Port-Id (87)
+type Attrib_Text NAS_Port_Id;
+
+// RFC 2869
+// Attrib: Framed-Pool (88)
+type Attrib_String Framed_Pool;
+
+

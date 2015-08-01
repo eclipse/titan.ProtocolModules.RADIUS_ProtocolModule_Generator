@@ -1,0 +1,185 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Juniper.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:                
+//                       
+//                      
+
+// Vendor: juniper (4874)
+
+type record juniper_type
+{
+  juniper_type_enum               f_juniper_type,
+  UINT8                           attrib_length_spec,
+  vendor_specific_value           string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_juniper_type, attrib_length_spec, string_val)"
+  variant (string_val) "CROSSTAG(
+    unsalted_string, {f_juniper_type=li_action,
+                  f_juniper_type=med_port_number,
+                  f_juniper_type=med_dev_handle,
+                  f_juniper_type=med_ip_address
+                 };
+    integer_val, { f_juniper_type=ingress_statistics,
+                  f_juniper_type=egress_statistics,
+                  f_juniper_type=service_category,
+                  f_juniper_type=pcr,
+                  f_juniper_type=scr_or_cbr_bit_rate,
+                  f_juniper_type=mbs,
+                  f_juniper_type=allow_all_vr_access,
+                  f_juniper_type=sa_validate,
+                  f_juniper_type=lgmp_enable,
+                  f_juniper_type=pppoe_max_sessions,
+                  f_juniper_type=qos_profile_interface_type,
+                  f_juniper_type=tunnel_nas_port_method,
+                  f_juniper_type=tunnel_tos,
+                  f_juniper_type=tunnel_max_sessions,
+                  f_juniper_type=framed_ip_route_tag,
+                  f_juniper_type=ppp_protocol,
+                  f_juniper_type=tunnel_min_bps,
+                  f_juniper_type=tunnel_max_bps,
+                  f_juniper_type=tunnel_bearer_type,
+                  f_juniper_type=input_gigapackets,
+                  f_juniper_type=output_gigapackets,
+                  f_juniper_type=df_bit,
+                  f_juniper_type=mld_version,
+                  f_juniper_type=igmp_version,
+                  f_juniper_type=ip_mcast_adm_bw_limit,
+                  f_juniper_type=ip6_mcast_adm_bw_limit,
+                  f_juniper_type=igmp_query_interval,
+                  f_juniper_type=igmp_max_resp_time,
+                  f_juniper_type=igmp_immediate_leave,
+                  f_juniper_type=mld_query_interval,
+                  f_juniper_type=mld_max_resp_time,
+                  f_juniper_type=mld_immediate_leave,
+                  f_juniper_type=service_interim_acct_interval,
+                  f_juniper_type=downstream_calculated_qos_rate,
+                  f_juniper_type=upstream_calculated_qos_rate
+                 };
+    tagged_integer,  {f_juniper_type=juniper_service_volume,
+                  f_juniper_type=juniper_service_timeout,
+                  f_juniper_type=juniper_service_stats
+                 };
+    tagged_text, f_juniper_type=juniper_service_activate;
+
+    string_val, OTHERWISE
+  )"
+}
+
+type set of juniper_type juniper_subattr_list;
+
+type enum_8 juniper_type_enum
+{
+  virtual_router                 (1),
+  local_address_pool             (2),
+  local_interface                (3),
+  primary_dns                    (4),
+  secondary_dns                  (5),
+  primary_wins                   (6),
+  secondary_wins                 (7),
+  tunnel_virtual_router          (8),
+  tunnel_password                (9),
+  ingress_policy_name           (10),
+  egress_policy_name            (11),
+  ingress_statistics            (12),
+  egress_statistics             (13),
+  service_category              (14),
+  pcr                           (15),
+  scr_or_cbr_bit_rate           (16),
+  mbs                           (17),
+  init_cli_access_level         (18),
+  allow_all_vr_access           (19),
+  alt_cli_access_level          (20),
+  alt_cli_vrouter_name          (21),
+  sa_validate                   (22),
+  lgmp_enable                   (23),
+  pppoe_description             (24),
+  redirect_vr_name              (25),
+  qos_profile_name              (26),
+  pppoe_max_sessions            (27),
+  pppoe_url                     (28),
+  qos_profile_interface_type    (29),
+  tunnel_nas_port_method        (30),
+  service_bundle                (31),
+  tunnel_tos                    (32),
+  tunnel_max_sessions           (33),
+  framed_ip_route_tag           (34),
+  tunnel_dialout_number         (35),
+  ppp_username                  (36),
+  ppp_password                  (37),
+  ppp_protocol                  (38),
+  tunnel_min_bps                (39),
+  tunnel_max_bps                (40),
+  tunnel_bearer_type            (41),
+  input_gigapackets             (42), 
+  output_gigapackets            (43),
+  tunnel_interface_id           (44),
+  ipv6_virtual_router           (45),
+  ipv6_local_interfaces         (46),
+  ipv6_primary_dns              (47),
+  ipv6_secondary_dns            (48),
+  sdx_service_name              (49),
+  sdx_session_volume_quota      (50),
+  disconnect_cause              (51),
+  radius_client_address         (52),
+  service_description           (53),
+  dhcp_options                  (55),
+  dhcp_mac_addr                 (56),
+  dhcp_gi_address               (57),
+  li_action                     (58),
+  med_dev_handle                (59),
+  med_ip_address                (60),
+  med_port_number               (61),
+  mlppp_bundle_name             (62),
+  interface_desc                (63),
+  tunnel_group                  (64),
+  juniper_service_activate      (65),
+  juniper_service_deactivate    (66),
+  juniper_service_volume        (67),
+  juniper_service_timeout       (68),
+  juniper_service_stats         (69),
+  df_bit                        (70),
+  igmp_access_name              (71),
+  igmp_access_src_name          (72),
+  igmp_oif_map_name             (73),
+  mld_access_name               (74),
+  mld_access_src_name           (75),
+  mld_oif_map_name              (76),
+  mld_version                   (77),
+  igmp_version                  (78),
+  ip_mcast_adm_bw_limit         (79),
+  ip6_mcast_adm_bw_limit        (80),
+  qos_parameters                (82),
+  service_session               (83),
+  igmp_query_interval           (95),
+  igmp_max_resp_time            (96),
+  igmp_immediate_leave          (97),
+  mld_query_interval            (98),
+  mld_max_resp_time             (99),
+  mld_immediate_leave           (100),
+  service_interim_acct_interval (140), 
+  downstream_calculated_qos_rate (141),
+  upstream_calculated_qos_rate  (142)
+}
+
+
+
+

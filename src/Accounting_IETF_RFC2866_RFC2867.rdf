@@ -1,0 +1,129 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               Accounting_IETF_RFC2866_RFC2867.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 2866(RADIUS Accounting)       
+//                      RFC 2867(RADIUS Accounting Modifications for Tunnel Protocol Support)       
+//                       
+//                      
+//
+
+
+// APPLICATION-NAME: Acc
+// APPLICATION-REVISION: RFC2866RFC2867
+
+// Packet-Type: Accounting_Request (4) 
+
+// Packet-Type: Accounting_Response (5)
+
+
+// RFC 2866 and RFC 2867
+// Attrib: Acct-Status-Type (40)
+type enumerated Acct_Status_Type
+{
+  Start (1),
+  Stop (2),
+  Interim_Update (3),
+  Accounting_On (7),
+  Accounting_Off (8),
+  Tunnel_Start  (9),
+  Tunnel_Stop  (10),
+  Tunnel_Reject  (11),
+  Tunnel_Link_Start  (12),
+  Tunnel_Link_Stop  (13),
+  Tunnel_Link_Reject  (14)
+}
+
+// RFC 2866
+// Attrib: Acct-Delay-Type (41)
+type Attrib_Value Acct_Delay_Type;
+
+// RFC 2866
+// Attrib: Acct-Input-Octets (42)
+type Attrib_Value Acct_Input_Octets;
+
+// RFC 2866
+// Attrib: Acct-Output-Octets (43)
+type Attrib_Value Acct_Output_Octets;
+
+// RFC 2866
+// Attrib: Acct-Session-Id (44)
+type Attrib_Text Acct_Session_Id;
+
+// RFC 2866
+// Attrib: Acct-Authentic (45)
+type enumerated Acct_Authentic
+{
+  RADIUS (1),
+  Local (2),
+  Remote (3)
+}
+
+// RFC 2866
+// Attrib: Acct-Session-Time (46)
+type Attrib_Value Acct_Session_Time;
+
+// RFC 2866
+// Attrib: Acct-Input-Packets (47)
+type Attrib_Value Acct_Input_Packets;
+
+// RFC 2866
+// Attrib: Acct-Output-Packets (48)
+type Attrib_Value Acct_Output_Packets;
+
+// RFC 2866
+// Attrib: Acct-Terminate-Cause (49)
+type enumerated Acct_Terminate_Cause
+{
+  User_Request (1),
+  Lost_Carrier (2),
+  Lost_Service (3),
+  Idle_Timeout (4),
+  Session_Timeout (5),
+  Admin_Reset (6),
+  Admin_Reboot (7),
+  Port_Error (8),
+  NAS_Error (9),
+  NAS_Request (10),
+  NAS_Reboot (11),
+  Port_Unneeded (12),
+  Port_Preempted (13),
+  Port_Suspended (14),
+  Service_Unavailable (15),
+  Callback (16),
+  User_Error (17),
+  Host_Request (18)
+}
+
+// RFC 2866
+// Attrib: Acct-Multi-Session-Id (50)
+type Attrib_String Acct_Multi_Session_Id;
+
+// RFC 2866
+// Attrib: Acct-Link-Count (51)
+type Attrib_Value Acct_Link_Count;
+
+// RFC 2867
+// Attrib: Acct-Tunnel-Connection (68)
+type Attrib_String Acct_Tunnel_Connection;
+
+// RFC 2867
+// Attrib: Acct-Tunnel-Packets-Lost (86)
+type Attrib_Value Acct_Tunnel_Packets_Lost;

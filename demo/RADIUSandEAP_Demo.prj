@@ -1,0 +1,59 @@
+<!DOCTYPE TITAN_GUI_project_file>
+<Project TITAN_version="1.8.pl2" >
+    <General>
+        <Project_Name>RADIUSandEAP_Demo</Project_Name>
+        <Executable_Path>myTest</Executable_Path>
+        <Working_Dir>.</Working_Dir>
+        <Build_Host>alpha</Build_Host>
+        <Execution_Mode>Parallel</Execution_Mode>
+        <Code_Splitting_Mode>None</Code_Splitting_Mode>
+        <ScriptFile_AfterMake>gui_make_RPMGandEAP.sh</ScriptFile_AfterMake>
+        <Log_Format>yes</Log_Format>
+        <Update_Symlinks>yes</Update_Symlinks>
+        <Create_Absolute_Symlinks>no</Create_Absolute_Symlinks>
+        <Update_Makefile>yes</Update_Makefile>
+        <Localhost_Execute>yes</Localhost_Execute>
+        <Execute_Command>rsh %host &quot;cd %project_working_dir ; &quot;%executable&quot; %localhost %mctr_port&quot;</Execute_Command>
+        <Execute_Hosts>alfa, beta, gamma</Execute_Hosts>
+        <UnUsed_List></UnUsed_List>
+    </General>
+    <Modules>
+        <Module>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_PortType.ttcn</Module>
+        <Module>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_Types.ttcn</Module>
+        <Module>RADIUSandEAP_Mapping.ttcn</Module>
+        <Module>RadiusAndEAP_Demo.ttcn</Module>
+        <Module>../../PPP_CNL113599/src/EAP_Types.ttcn</Module>
+        <Module>../../COMMON/src/General_Types.ttcn</Module>
+    </Modules>
+    <TestPorts>
+        <TestPort>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_PT.cc</TestPort>
+        <TestPort>../../../TestPorts/UDPasp_CNL113346/src/UDPasp_PT.hh</TestPort>
+    </TestPorts>
+    <Other_Sources>
+        <Other_Source>../../PPP_CNL113599/src/EAP_EncDec.cc</Other_Source>
+        <Other_Source>../src/RADIUS_EncDec.cc</Other_Source>
+    </Other_Sources>
+    <Configs>
+        <Config>RADIUSandEAP.cfg</Config>
+    </Configs>
+    <Test_Cases>
+        <Test_Case>RadiusAndEAP_Demo.control</Test_Case>
+        <Test_Case>RadiusAndEAP_Demo.tc_RADIUS_EAP_AKA_full_authentication</Test_Case>
+        <Test_Case>RadiusAndEAP_Demo.tc_RADIUS_EAP_SIM_full_authentication</Test_Case>
+        <Test_Case>RadiusAndEAP_Demo.tc_RADIUS_EAP_SIM_reauthentication</Test_Case>
+    </Test_Cases>
+    <Others>
+        <Other>gui_make_RPMGandEAP.sh</Other>
+        <Other>../src/ATTR.awk</Other>
+        <Other>../src/IPv6_IETF_RFC3162.rdf</Other>
+        <Other>../src/Base_IETF_RFC2865.rdf</Other>
+        <Other>../src/BaseTypes_IETF_RFC2865.rdf</Other>
+        <Other>../src/Extensions_IETF_RFC2869.rdf</Other>
+        <Other>../src/TunnelAuthentication_IETF_RFC2868.rdf</Other>
+        <Other>../src/Extensions_IETF_RFC2869.rdf</Other>
+        <Other>../src/GGSN_FS_46_15517_CSA113_35_4RevB.rdf</Other>
+        <Other>../src/Accounting_IETF_RFC2866_RFC2867.rdf</Other>
+        <Other>../src/DynamicAuthorizationExtensions_IETF_RFC5176.rdf</Other>
+    </Others>
+    <File_Group name="MainFileGroup" />
+</Project>

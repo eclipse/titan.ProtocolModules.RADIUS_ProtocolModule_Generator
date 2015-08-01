@@ -1,0 +1,60 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               skt.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:                
+//                       
+//                      
+
+// Vendor: skt           (5806)
+
+
+type enum_8 skt_type_enum
+{
+  service_key                   (1),
+  prepaid_expired               (2),
+  preservation_indicator        (17)
+} 
+
+
+
+
+
+type union skt_value {
+  octetstring                 string_val,
+  UINT32                      integer_val,
+  UINT8                       byte_val
+}  
+
+
+type record skt_subattr_t {
+  skt_type_enum       skt_type,
+  UINT8               skt_length,
+  skt_value           skt_val
+} with {
+  variant (skt_length) "LENGTHTO(skt_type, skt_length, skt_val)";
+  variant (skt_val) "CROSSTAG(
+    string_val,               skt_type=preservation_indicator;
+    byte_val,                 skt_type=prepaid_expired;
+    integer_val,              skt_type=service_key)"
+  }
+
+type set of skt_subattr_t skt_subattr_list;
+

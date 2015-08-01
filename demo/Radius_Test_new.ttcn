@@ -1,0 +1,606 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+//
+//  File:               Radius_Test_new.ttcn
+//  Rev:                R12A
+//  Prodnr:             CNL 113 600
+//  Remark:             This file is not a part of the product.       
+//                       
+//                      
+//
+
+
+module Radius_Test_new {
+
+import from  RADIUS_Mapping_new      all;
+import from  UDPasp_PortType    all;
+import from UDPasp_Types      all;
+import from RADIUS_Types all;
+
+modulepar charstring tsp_addressf := "159.107.193.33";
+modulepar integer tsp_portf := 1100;
+
+
+type component RADIUS_MTC
+{
+
+}
+
+type component RADIUSComponent_CT
+{
+  port UDPasp_RADIUS_PT   RADIUS_PORT ;
+}
+
+
+type component SystemComponent 
+{
+  port UDPasp_PT  RADIUS_Port;
+}
+
+
+
+
+// receive Access Req, send Access Accept
+ testcase tc_RADIUS_server_receiveAccessRequest_sendAccessAccept_with_correct_auth() runs on RADIUSComponent_CT system SystemComponent
+{
+  var RADIUSComponent_CT v_server := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_server: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(server))
+
+  v_server.start(f_receiveAccessRequest_sendAccessAccept_with_correct_auth())
+  
+  v_server.done
+  
+  v_mapping.kill
+
+}
+
+
+
+function f_receiveAccessRequest_sendAccessAccept_with_correct_auth() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Accept ,
+                      identifier := 1,
+                       message_length := 0, 
+                       authenticator :=   '00000000000000000000000000000000'O,                                           
+                       attributes := {  } 
+                      },
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+
+  var ASP_UDP_RADIUS v_ASP_UDP_RADIUS1
+  timer t1 := 5.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive (ASP_UDP_RADIUS:?) -> value v_ASP_UDP_RADIUS1{
+        if (v_ASP_UDP_RADIUS1.data.code==Access_Request) {
+          RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+          setverdict(pass)}}
+    [] t1.timeout {setverdict (fail)}
+    }
+  
+   
+}
+
+
+// receive Access Req, send Access Accept with incorrect Auth Resp
+ testcase tc_RADIUS_server_receiveAccessRequest_sendAccessAccept_with_incorrect_auth() runs on RADIUSComponent_CT system SystemComponent
+ {
+  var RADIUSComponent_CT v_server := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_server: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(server))
+
+  v_server.start(f_receiveAccessRequest_sendAccessAccept_with_incorrect_auth())
+  
+  v_server.done
+  
+  v_mapping.kill
+
+}
+
+
+function f_receiveAccessRequest_sendAccessAccept_with_incorrect_auth() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Accept ,
+                      identifier := 1,
+                       message_length := 0, 
+                       authenticator :=   '00000000000000000000000000000001'O,                                           
+                       attributes := {  } 
+                      },
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+
+  var ASP_UDP_RADIUS v_ASP_UDP_RADIUS1
+  timer t1 := 5.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive (ASP_UDP_RADIUS:?) -> value v_ASP_UDP_RADIUS1{
+        if (v_ASP_UDP_RADIUS1.data.code==Access_Request) {
+          RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+          setverdict(pass)}}
+    [] t1.timeout {setverdict (fail)}
+    }  
+   
+}
+
+
+ testcase  tc_RADIUS_client_sendAccessRequest() runs on RADIUSComponent_CT system SystemComponent
+{
+ var RADIUSComponent_CT v_client := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_client: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(client))
+
+  v_client.start(f_sendAccessRequest())
+  
+  v_client.done
+  
+  v_mapping.kill 
+  
+ } 
+
+function f_sendAccessRequest() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Request ,
+                      identifier := 1,
+                       message_length := 0, 
+                       authenticator :=   '00000000000000000000000000000000'O,                                           
+                       attributes := {  } 
+                      },
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+
+  RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+  timer t1 := 5.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive {setverdict(pass)}
+    [] t1.timeout {setverdict (fail)}
+    }
+
+
+}
+
+////////////////////////////////////////////////////////
+//send Access Req, receive Access Accept
+ testcase  tc_RADIUS_client_sendAccessRequest_receiveAccessAccept() runs on RADIUSComponent_CT system SystemComponent
+{
+ var RADIUSComponent_CT v_client := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_client: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(client))
+
+  v_client.start(f_sendAccessRequest_receiveAccessAccept())
+  
+  v_client.done
+  
+  v_mapping.kill 
+  
+ } 
+
+function f_sendAccessRequest_receiveAccessAccept() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Request ,
+                      identifier := 1,
+                       message_length := 56, 
+                       authenticator :=   '00000000000000000000000000000000'O,                                      
+                       attributes := {
+                         { genericAttrib:={
+                              attrib_type := Base_User_Name,
+                              attrib_length := 6,
+                              attrib_data := {base_user_name:=char2oct("nemo")} } }, 
+                         { genericAttrib:={
+                              attrib_type := Base_User_Password,
+                              attrib_length := 18,
+                              attrib_data := {base_user_password:=char2oct("nemo21") }}},
+                          { genericAttrib:={
+                              attrib_type := Base_NAS_IP_Address,
+                              attrib_length := 6,
+                              attrib_data := {base_nas_ip_address:='C0A80110'O } } },
+                          { genericAttrib:={
+                              attrib_type := Base_NAS_Port,
+                              attrib_length := 6,
+                              attrib_data := {base_nas_port:=3}  }}
+                           
+                        }  
+                      },
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+
+  template ASP_UDP_RADIUS v_ASP_UDP_RADIUS2:= 
+   { data := { code := Access_Accept ,
+                      identifier := 1,
+                      message_length := ?, 
+                      authenticator :=   ?,                                          
+                      attributes := ?
+                      },
+      addressf := ?, 
+       portf := ? } 
+
+  RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+  timer t1 := 5.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive(v_ASP_UDP_RADIUS2) {setverdict(pass)}
+    [] t1.timeout {setverdict (fail)}
+    }
+
+}
+
+//send Access Accept?!
+ testcase  tc_RADIUS_client_sendAccessAccept() runs on RADIUSComponent_CT system SystemComponent
+{
+ var RADIUSComponent_CT v_client := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_client: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(client))
+
+  v_client.start(f_sendAccessAccept())
+  
+  v_client.done
+  
+  v_mapping.kill 
+  
+ } 
+
+function f_sendAccessAccept() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Accept ,
+                      identifier := 1,
+                       message_length := 56, 
+                       authenticator :=   '00000000000000000000000000000000'O,                                           
+                       attributes := {}  
+                      },
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+
+  RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+
+}
+
+
+//send Accounting Req, receive Accounting Response
+ testcase  tc_RADIUS_client_sendAccountingRequest_receiveAccountingResponse() runs on RADIUSComponent_CT system SystemComponent
+{
+ var RADIUSComponent_CT v_client := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_client: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(client))
+
+  v_client.start(f_sendAccountingRequest_receiveAccountingResponse())
+  
+  v_client.done
+  
+  v_mapping.kill 
+  
+ } 
+
+function f_sendAccountingRequest_receiveAccountingResponse() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Accounting_Request ,
+                      identifier := 1,
+                      message_length := 0, 
+                      authenticator :=   '00000000000000000000000000000000'O,                                         
+                      attributes := {
+                          { genericAttrib:={
+                              attrib_type := Acc_Acct_Status_Type,
+                              attrib_length := 0,
+                              attrib_data:={acc_acct_status_type := Stop }}} , 
+                          { genericAttrib:={
+                              attrib_type := Acc_Acct_Input_Packets,
+                              attrib_length := 0,
+                              attrib_data:={acc_acct_input_packets := 5  }}}
+                         }},
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+
+template ASP_UDP_RADIUS v_ASP_UDP_RADIUS2:= 
+   { data := { code := Accounting_Response ,
+                      identifier := 1,
+                      message_length := ?, 
+                      authenticator :=   ?,                                         
+                      attributes := ?
+                      },
+      addressf := ?, 
+       portf := ? } 
+
+  RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+  timer t1 := 10.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive(v_ASP_UDP_RADIUS2) {setverdict(pass)}
+    [] t1.timeout {setverdict (fail)}
+    }
+
+
+
+}
+
+
+// receive Access Req, send Access Accept
+ testcase tc_RADIUS_server_receiveAccessRequest_sendAccessAccept() runs on RADIUSComponent_CT system SystemComponent
+{
+  var RADIUSComponent_CT v_server := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_server: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(server))
+
+  v_server.start(f_receiveAccessRequest_sendAccessAccept())
+  
+  v_server.done
+  
+  v_mapping.kill
+
+}
+
+function f_receiveAccessRequest_sendAccessAccept() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Accept ,
+              identifier := 1,
+              message_length := 0, 
+              authenticator :=   '00000000000000000000000000000000'O,                                           
+              attributes := { 
+                         { genericAttrib:={
+                              attrib_type := Base_Service_Type,
+                              attrib_length := 6,
+                              attrib_data:={base_service_type := Framed }} }, 
+                         { genericAttrib:={
+                              attrib_type := Base_Framed_Protocol,
+                              attrib_length := 6,
+                              attrib_data:={base_framed_protocol := PPP} }},
+                          { genericAttrib:={
+                              attrib_type := Base_Framed_IP_Address,
+                              attrib_length := 6,
+                              attrib_data:={base_framed_ip_address := 'FFFFFFFE'O  } }},
+                          {genericAttrib:={
+                              attrib_type := Base_Framed_Routing,
+                              attrib_length := 6,
+                              attrib_data:={base_framed_routing := None } }},
+                          { genericAttrib:={
+                              attrib_type := Base_Framed_Compression,
+                              attrib_length := 6,
+                              attrib_data:={base_framed_compression := VJ_TCP_IP_header_compression }} },
+                          { genericAttrib:={
+                              attrib_type := Base_Framed_MTU,
+                              attrib_length := 6,
+                              attrib_data:={base_framed_mtu := 1500 } }}
+                            }},
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+  var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1 
+
+  timer t1 := 10.0;
+  t1.start;
+  alt {
+    [] RADIUS_PORT.receive(ASP_UDP_RADIUS:?) -> value v_ASP_UDP_RADIUS1{
+        if (v_ASP_UDP_RADIUS1.data.code==Access_Request) {
+          v_ASP_UDP_RADIUS.data.identifier := v_ASP_UDP_RADIUS1.data.identifier;
+          RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+          setverdict(pass)}
+        else {setverdict(fail); repeat;}}
+    [] t1.timeout {setverdict (fail)}
+    }
+
+
+}
+
+
+// receive Access Req, send Access Challenge
+ testcase tc_RADIUS_server_receiveAccessRequest_sendAccessChallenge() runs on RADIUSComponent_CT system SystemComponent
+{
+  var RADIUSComponent_CT v_server := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_server: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(server))
+
+  v_server.start(f_receiveAccessRequest_sendAccessChallenge())
+  
+  v_server.done
+  
+  v_mapping.kill
+
+}
+
+function f_receiveAccessRequest_sendAccessChallenge() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Access_Challenge ,
+              identifier := 1,
+              message_length := 78, 
+              authenticator :=   '00000000000000000000000000000000'O,                                          
+              attributes := { 
+                         { genericAttrib:={
+                              attrib_type := Base_Reply_Message,
+                              attrib_length := 48,
+                              attrib_data:={base_reply_message := "Challenge 32769430. Enter response at prompt." }}}, 
+                         {genericAttrib:={
+                              attrib_type := Base_State,
+                              attrib_length := 10,
+                              attrib_data:={base_state := '3332373639343330'O } }}
+                            }},
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1 
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS2
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS3:= 
+  { data := { code := Access_Reject ,
+              identifier := 1,
+              message_length := 20, 
+              authenticator :=   '00000000000000000000000000000000'O,                                               
+              attributes := {}},
+     addressf := tsp_addressf, 
+     portf := tsp_portf }     
+ timer t1 := 10.0;
+ t1.start;
+ alt {
+    [] RADIUS_PORT.receive(ASP_UDP_RADIUS:?) -> value v_ASP_UDP_RADIUS1{
+        if (v_ASP_UDP_RADIUS1.data.code==Access_Request){
+          v_ASP_UDP_RADIUS.data.identifier := v_ASP_UDP_RADIUS1.data.identifier;
+          RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+          RADIUS_PORT.receive(ASP_UDP_RADIUS:?) -> value v_ASP_UDP_RADIUS2
+          if (v_ASP_UDP_RADIUS2.data.code==Access_Request){
+                  v_ASP_UDP_RADIUS3.data.identifier := v_ASP_UDP_RADIUS2.data.identifier;
+                  RADIUS_PORT.send(v_ASP_UDP_RADIUS3);
+                  setverdict(pass)}
+          else {setverdict (fail)}}
+         else {setverdict (fail)}
+         }
+    [] t1.timeout {setverdict (fail)}
+    }
+
+
+}
+
+
+
+    
+// receive Accounting Req, send Accounting Response
+ testcase tc_RADIUS_server_receiveAccountingRequest_sendAccountingResponse() runs on RADIUSComponent_CT system SystemComponent
+{
+  var RADIUSComponent_CT v_server := RADIUSComponent_CT.create;
+  var RADIUS_mapping_CT v_mapping := RADIUS_mapping_CT.create;
+
+  connect(v_server: RADIUS_PORT , v_mapping:UDP_RADIUS_PCO);
+  map(v_mapping:UDP_PCO, system: RADIUS_Port)
+
+  v_mapping.start(f_RADIUS_EncDec_Start(server))
+
+  v_server.start(f_receiveAccountingRequest_sendAccountingResponse())
+  
+  v_server.done
+  
+  v_mapping.kill
+
+}
+
+function f_receiveAccountingRequest_sendAccountingResponse() runs on   RADIUSComponent_CT
+{
+ var ASP_UDP_RADIUS v_ASP_UDP_RADIUS:= 
+
+  { data := { code := Accounting_Response ,
+              identifier := 1,
+              message_length := 0, 
+              authenticator :=   '00000000000000000000000000000000'O,                                           
+              attributes := {
+                       { genericAttrib:={
+                              attrib_type := Base_Proxy_State,
+                              attrib_length := 10,
+                              attrib_data:={base_proxy_state := '3332373639343330'O }}}
+                       }},
+     addressf := tsp_addressf, 
+     portf := tsp_portf } 
+ var  ASP_UDP_RADIUS v_ASP_UDP_RADIUS1; 
+ timer t1 := 10.0;
+ t1.start;
+ alt {
+    [] RADIUS_PORT.receive(ASP_UDP_RADIUS:?) -> value v_ASP_UDP_RADIUS1{
+        if (v_ASP_UDP_RADIUS1.data.code==Accounting_Request){
+          v_ASP_UDP_RADIUS.data.identifier := v_ASP_UDP_RADIUS1.data.identifier;
+          RADIUS_PORT.send(v_ASP_UDP_RADIUS);
+          setverdict (pass)}
+         else {setverdict (fail); repeat;}}
+     [] t1.timeout {setverdict (fail)}
+    }
+
+}
+
+ testcase tc_RADIUS_encdec() runs on RADIUSComponent_CT
+{
+  var PDU_RADIUS v_PDU_RADIUS:=
+  { code := Accounting_Response ,
+              identifier := 1,
+              message_length := 0, 
+              authenticator :=   '00000000000000000000000000000000'O,                                           
+              attributes := {
+                { genericAttrib:={
+                    attrib_type := Base_Vendor_Specific,
+                    attrib_length := 0,
+                    attrib_data:=
+                       {base_vendor_specific :={
+                            vendor_id:=scap,
+                            attrib_value:= {f_scap_subattr_list:={{
+                                    scap_type:=suggested_secondary_rulespace,
+                                    scap_length:=0,
+                                    scap_val:={charstring_val:="Na"}}}}
+                    }}}},
+                 { genericAttrib:={
+                     attrib_type := IPv6_Framed_IPv6_Prefix,
+                     attrib_length := 0,
+                     attrib_data:=
+                        {ipv6_framed_ipv6_prefix :={
+                            reserved:='00'O,
+                            prefix_length:=0,
+                            prefixValue:= '00100000000000000011111111111110000000000000000100000000000001'B,//oct2bit('20003ffe00010001'O),
+                            prefixPadding := '00'B
+                    }}}}
+
+     }};
+   log(v_PDU_RADIUS);
+   var octetstring v_oct1:=f_RADIUS_Enc(v_PDU_RADIUS);
+   log(v_oct1);
+   v_PDU_RADIUS:=f_RADIUS_Dec(v_oct1);
+   log(v_PDU_RADIUS);
+   var octetstring v_oct2:=f_RADIUS_Enc(v_PDU_RADIUS);
+   if (v_oct1 == v_oct2){setverdict (pass)}
+   else {setverdict (fail)}
+
+ 
+}
+
+ 
+}

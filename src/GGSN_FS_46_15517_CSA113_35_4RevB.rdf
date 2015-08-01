@@ -1,0 +1,55 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               GGSN_FS_46_15517_CSA113_4RevB.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          GGSN Functional Specification: RADIUS       
+//                      46/155 17-CSA 113 35/4 Uen Rev B 
+//                      
+//
+
+
+// APPLICATION-NAME: Ggsn
+// APPLICATION-REVISION: VB
+
+// Attrib: Imsi (224)
+type Attrib_Text Imsi;
+
+// Attrib: Charging-Id (225)
+type Attrib_Value Charging_Id;
+
+// Attrib: Imsi-Mcc-Mnc (226)
+type Attrib_Text Imsi_Mcc_Mnc;
+
+// Attrib: Sgsn-IP-Address (228)
+type Attrib_Address Sgsn_IP_Address;
+
+// Attrib: Selection-Mode (229)
+type Attrib_Text Selection_Mode;
+
+// Attrib: Ggsn-Gtp-IP-Address (230)
+type Attrib_Address Ggsn_Gtp_IP_Address;
+
+// Attrib: Primary-Dns-Server (135)
+type Attrib_Address Primary_Dns_Server;
+
+// Attrib: Secondary-Dns-Server (136)
+type Attrib_Address Secondary_Dns_Server;
+
+

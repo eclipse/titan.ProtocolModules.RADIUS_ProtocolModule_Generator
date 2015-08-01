@@ -1,0 +1,427 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+//
+//  File:               RADIUS_Mapping_orig.ttcn
+//  Description:        Example module providing UDP Mapping for RPMG
+//  Rev:                R12A
+//  Prodnr:             CNL 113 600
+//  Remark:             This file is not a part of the product.
+//                      
+//                      
+//
+
+
+module RADIUS_Mapping_orig
+{
+  import from RADIUS_Types all;
+  import from UDPasp_Types all;
+  import from UDPasp_PortType all;
+  
+  modulepar{
+   charstring tsp_SharedSecret := "sharedSecret" 
+  }
+    
+
+type record ASP_UDP_RADIUS {
+	  PDU_RADIUS data,
+	  AddressType addressf,
+	  PortType portf
+}
+
+type port UDPasp_RADIUS_PT message { 
+
+        inout   ASP_UDP_RADIUS
+} with {extension "internal"}
+
+
+type component RADIUS_mapping_CT  { 
+
+  var RADIUS_port_descriptor v_RADIUS_port_descriptor;
+       
+  port UDPasp_RADIUS_PT    UDP_RADIUS_PCO;  // upper port
+  port UDPasp_PT           UDP_PCO;         // lower port
+        
+}
+  
+template ASP_UDP t_ASP_UDP := ?;
+template ASP_UDP_RADIUS t_ASP_UDP_RADIUS := ?;
+
+
+  type record of vsa_descriptor vsa_descriptor_list;
+
+  type record vsa_descriptor {
+    integer       vendor_id,
+    integer_list  subattr_types
+  }
+
+//================================================================
+// Types from RADIUS test port, info needed for external functions
+//================================================================
+type record RADIUS_port_descriptor {
+  boolean global_keying, // if this is set to true, 256 will be used instead of EAP Identifier
+  charstring secret,
+  integer mode,
+  octetstring req_auth[256],
+  octetstring req_acct[256],
+  boolean debugging
+}
+
+type record of integer integer_list;
+   
+type enumerated generic_attrib_value_union_selection {
+  unbound,
+  text_val,
+  string_val,
+  address_val,
+  integer_val,
+  time_val
+}
+
+type enumerated RADIUS_Mode {client, server};
+
+//================================================================
+//================================================================
+//================================================================
+
+
+// Sending in Server mode
+// -- Access_Accept or
+// -- Access_Reject or
+// -- Access_Challenge or
+// -- Accounting_Response
+// == Disconnect_Request == NOT HANDLED
+function f_handle_outgoing_server_message(in ASP_UDP_RADIUS pl_ASP_UDP_RADIUS) runs on RADIUS_mapping_CT {
+
+  if (pl_ASP_UDP_RADIUS.data.code == Access_Accept)
+    {
+       if (pl_ASP_UDP_RADIUS.data.authenticator == '00000000000000000000000000000000'O)
+       {  
+         if (isvalue(v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier])) 
+          {        
+           var octetstring v_RADIUS_encoded := f_RADIUS_Enc(pl_ASP_UDP_RADIUS.data);
+        
+           pl_ASP_UDP_RADIUS.data.authenticator :=             
+             f_calc_MD5( 
+               substr(v_RADIUS_encoded,0,4)  
+               & v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+               & substr(v_RADIUS_encoded,20,(lengthof(v_RADIUS_encoded)-20)) 
+               & char2oct(tsp_SharedSecret));                  
+           }       
+       }       
+       f_encode_send(pl_ASP_UDP_RADIUS)      
+    }
+  else if (pl_ASP_UDP_RADIUS.data.code == Access_Reject)
+    {
+       if (pl_ASP_UDP_RADIUS.data.authenticator == '00000000000000000000000000000000'O)
+       {
+         if (isvalue(v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier])) 
+          {      
+           var octetstring v_RADIUS_encoded := f_RADIUS_Enc(pl_ASP_UDP_RADIUS.data);
+           pl_ASP_UDP_RADIUS.data.authenticator :=             
+             f_calc_MD5( 
+               substr(v_RADIUS_encoded,0,4)  
+               & v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+               & substr(v_RADIUS_encoded,20,(lengthof(v_RADIUS_encoded)-20)) 
+               & char2oct(tsp_SharedSecret));   
+           }       
+       }    
+       f_encode_send(pl_ASP_UDP_RADIUS)      
+    }       
+  else if (pl_ASP_UDP_RADIUS.data.code == Access_Challenge)
+    {
+       if (pl_ASP_UDP_RADIUS.data.authenticator == '00000000000000000000000000000000'O)
+       {
+         if (isvalue(v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier])) 
+          {      
+           var octetstring v_RADIUS_encoded := f_RADIUS_Enc(pl_ASP_UDP_RADIUS.data);
+           pl_ASP_UDP_RADIUS.data.authenticator :=             
+             f_calc_MD5( 
+               substr(v_RADIUS_encoded,0,4)  
+               & v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+               & substr(v_RADIUS_encoded,20,(lengthof(v_RADIUS_encoded)-20)) 
+               & char2oct(tsp_SharedSecret));   
+           }       
+       }     
+       f_encode_send(pl_ASP_UDP_RADIUS)      
+    }  
+  else if (pl_ASP_UDP_RADIUS.data.code == Accounting_Response)
+    {
+       if (pl_ASP_UDP_RADIUS.data.authenticator == '00000000000000000000000000000000'O)
+       {
+         if (isvalue(v_RADIUS_port_descriptor.req_acct[pl_ASP_UDP_RADIUS.data.identifier])) 
+          {      
+           var octetstring v_RADIUS_encoded := f_RADIUS_Enc(pl_ASP_UDP_RADIUS.data);
+           pl_ASP_UDP_RADIUS.data.authenticator :=             
+             f_calc_MD5( 
+               substr(v_RADIUS_encoded,0,4)  
+               & v_RADIUS_port_descriptor.req_acct[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+               & substr(v_RADIUS_encoded,20,(lengthof(v_RADIUS_encoded)-20)) 
+               & char2oct(tsp_SharedSecret));   
+           }          
+       }   
+       f_encode_send(pl_ASP_UDP_RADIUS)      
+    }   
+  else {log("Warning : Will not send out Radius message with code ", pl_ASP_UDP_RADIUS.data.code, " in Server mode!") }        
+}
+
+// Sending in Client mode
+// -- Access_Request or 
+// -- Accounting_Request
+//  == Access_Challenge == NOT HANDLED
+//  == Disconnect_Ack == NOT HANDLED 
+//  == Disconnect_Nak == NOT HANDLED
+function f_handle_outgoing_client_message(in ASP_UDP_RADIUS pl_ASP_UDP_RADIUS) runs on RADIUS_mapping_CT {
+
+  if (pl_ASP_UDP_RADIUS.data.code == Access_Request)
+    {  
+      // fill out authenticator with random number if template has 0s  
+      if (pl_ASP_UDP_RADIUS.data.authenticator == '00000000000000000000000000000000'O)
+       {        
+          var integer i;
+          for ( i := 0; i < 16; i := i+1) 
+           { 
+             pl_ASP_UDP_RADIUS.data.authenticator[i] := int2oct(float2int(int2float(256)*rnd()),1)    
+           }
+      }  
+       v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier] := pl_ASP_UDP_RADIUS.data.authenticator;
+
+       // Calulate hidden password
+       var integer j := 0;   
+       while (j < sizeof(pl_ASP_UDP_RADIUS.data.attributes))  
+          {          
+            if (ischosen(pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password))
+            {            
+        var integer v_pw_len :=lengthof(pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password.base_user_password);
+               var integer v_padding_length := 16 - (v_pw_len mod 16);                              
+        var octetstring v_padded_password :=
+           
+pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password.base_user_password & int2oct(0,v_padding_length)            
+               var octetstring v_hidden_password := f_calculate_password(
+                          v_padded_password,
+                          pl_ASP_UDP_RADIUS.data.authenticator,
+                          false        
+                          );
+               pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password.base_user_password := v_hidden_password;
+               j :=  sizeof(pl_ASP_UDP_RADIUS.data.attributes)  // stop while loop                                                
+            }
+            j := j + 1;          
+          }
+       f_encode_send(pl_ASP_UDP_RADIUS);  
+     }
+
+  else if (pl_ASP_UDP_RADIUS.data.code == Accounting_Request)
+   {
+      if (pl_ASP_UDP_RADIUS.data.authenticator == '00000000000000000000000000000000'O)   
+       {        
+         pl_ASP_UDP_RADIUS.data.authenticator := f_calc_MD5(f_RADIUS_Enc(pl_ASP_UDP_RADIUS.data) & char2oct(tsp_SharedSecret));                  
+       }
+        v_RADIUS_port_descriptor.req_acct[pl_ASP_UDP_RADIUS.data.identifier] := pl_ASP_UDP_RADIUS.data.authenticator;
+        f_encode_send(pl_ASP_UDP_RADIUS);                
+    }
+  else {log("Warning : Will not send out Radius message with code ", pl_ASP_UDP_RADIUS.data.code, " in Client mode!") } 
+}
+
+
+
+// -- Access_Accept or 
+// -- Access_Reject or
+// -- Access_Challenge or
+// -- Accounting_Response
+// == Disconnect_Request == NOT HANDLED      
+function f_handle_incoming_server_message(in ASP_UDP_RADIUS pl_ASP_UDP_RADIUS, octetstring pl_asp_udp_data) runs on RADIUS_mapping_CT {
+
+   if (pl_ASP_UDP_RADIUS.data.code == Access_Accept)
+     {
+         UDP_RADIUS_PCO.send(pl_ASP_UDP_RADIUS); 
+       
+         var octetstring v_calc_auth := f_calc_MD5( 
+            substr(pl_asp_udp_data,0,4) 
+            & v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+            & substr(pl_asp_udp_data,20, lengthof(pl_asp_udp_data)-20)
+            & char2oct(tsp_SharedSecret))
+       
+        if (v_calc_auth != pl_ASP_UDP_RADIUS.data.authenticator)
+        { log("Warning : Unexpected authentication value received in message with code ", pl_ASP_UDP_RADIUS.data.code)  }      
+     }
+     
+   else if (pl_ASP_UDP_RADIUS.data.code == Access_Reject)
+     {
+         UDP_RADIUS_PCO.send(pl_ASP_UDP_RADIUS); 
+       
+         var octetstring v_calc_auth := f_calc_MD5( 
+            substr(pl_asp_udp_data,0,4) 
+            & v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+            & substr(pl_asp_udp_data,20, lengthof(pl_asp_udp_data)-20)
+            & char2oct(tsp_SharedSecret))
+       
+        if (v_calc_auth != pl_ASP_UDP_RADIUS.data.authenticator)
+        { log("Warning : Unexpected authentication value received in message with code ", pl_ASP_UDP_RADIUS.data.code)  }         
+     }
+     
+   else if (pl_ASP_UDP_RADIUS.data.code == Access_Challenge)
+     {
+         UDP_RADIUS_PCO.send(pl_ASP_UDP_RADIUS); 
+       
+         var octetstring v_calc_auth := f_calc_MD5( 
+            substr(pl_asp_udp_data,0,4) 
+            & v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier]  // stored value 
+            & substr(pl_asp_udp_data,20, lengthof(pl_asp_udp_data)-20)
+            & char2oct(tsp_SharedSecret))
+       
+        if (v_calc_auth != pl_ASP_UDP_RADIUS.data.authenticator)
+        { log("Warning : Unexpected authentication value received in message with code ", pl_ASP_UDP_RADIUS.data.code)  }          
+     } 
+     
+   else if (pl_ASP_UDP_RADIUS.data.code == Accounting_Response)
+     {
+     
+       UDP_RADIUS_PCO.send(pl_ASP_UDP_RADIUS);
+       
+       var octetstring v_calc_auth := f_calc_MD5(        
+            substr(pl_asp_udp_data,0,4)        
+            & v_RADIUS_port_descriptor.req_acct[pl_ASP_UDP_RADIUS.data.identifier]   // stored value       
+            & substr(pl_asp_udp_data,20, lengthof(pl_asp_udp_data)-20)
+            & char2oct(tsp_SharedSecret))       
+       
+        if (v_calc_auth != pl_ASP_UDP_RADIUS.data.authenticator)
+        { log("Warning : Unexpected authentication value received in message with code ", pl_ASP_UDP_RADIUS.data.code)  }              
+    }
+ 
+   else {log("Warning : Unexpected message with code ", pl_ASP_UDP_RADIUS.data.code, " received in Client mode") } 
+}
+
+// Access_Request or 
+// Accounting_Request
+// == Access_Challenge == NOT HANDLED
+// == Disconnect_Ack == NOT HANDLED
+// == Disconnect_Nak == NOT HANDLED
+function f_handle_incoming_client_message(in ASP_UDP_RADIUS pl_ASP_UDP_RADIUS,octetstring pl_asp_udp_data) runs on RADIUS_mapping_CT {
+
+   if (pl_ASP_UDP_RADIUS.data.code == Access_Request) 
+
+     {
+
+      // Calulate password from hidden password
+       var integer j := 0;   
+       while (j < sizeof(pl_ASP_UDP_RADIUS.data.attributes))  
+          {          
+            if (ischosen(pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password))
+            {
+               var octetstring v_padded_password := f_calculate_password(
+                          pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password.base_user_password,
+                          pl_ASP_UDP_RADIUS.data.authenticator,
+                          true        
+                          ); 
+
+               var integer v_padding_length := 0;
+               while (v_padded_password[lengthof(v_padded_password) - v_padding_length - 1] == '00'O)
+                {
+                   v_padding_length := v_padding_length + 1;
+                } 
+
+               var octetstring v_password:= substr (v_padded_password,0,lengthof(v_padded_password) - v_padding_length);                 
+
+               pl_ASP_UDP_RADIUS.data.attributes[j].attrib_Base_User_Password.base_user_password := v_password;
+               j :=  sizeof(pl_ASP_UDP_RADIUS.data.attributes)  // stop while loop                                                
+            }
+            j := j + 1;          
+          } 
+
+       UDP_RADIUS_PCO.send(pl_ASP_UDP_RADIUS); 
+
+       v_RADIUS_port_descriptor.req_auth[pl_ASP_UDP_RADIUS.data.identifier] := pl_ASP_UDP_RADIUS.data.authenticator // store value      
+
+     }     
+   else if (pl_ASP_UDP_RADIUS.data.code ==  Accounting_Request)    
+     {
+       UDP_RADIUS_PCO.send(pl_ASP_UDP_RADIUS);  
+
+       v_RADIUS_port_descriptor.req_acct[pl_ASP_UDP_RADIUS.data.identifier] := pl_ASP_UDP_RADIUS.data.authenticator // store value       
+     
+       var octetstring v_calc_auth := f_calc_MD5(
+           substr(pl_asp_udp_data,0,4)
+           & '00000000000000000000000000000000'O
+           & substr(pl_asp_udp_data,20, lengthof(pl_asp_udp_data)-20) 
+           & char2oct(tsp_SharedSecret)
+       )  
+        if (v_calc_auth != pl_ASP_UDP_RADIUS.data.authenticator)
+        { log("Warning : Unexpected authentication value received in message with code ", pl_ASP_UDP_RADIUS.data.code)  }               
+      }        
+   else {log("Warning : Unexpected message with code ", pl_ASP_UDP_RADIUS.data.code, " received in Server mode")}
+}
+
+
+// Encrypts Password field in Access Request using Request Authentication
+// field and shared secret (modulepar)
+function f_calculate_password( octetstring pl_password,octetstring pl_authenticatior, boolean pl_decrypt)  runs on RADIUS_mapping_CT return octetstring{
+   return f_crypt_password (pl_password,pl_authenticatior,''O,pl_decrypt,tsp_SharedSecret)   // false = encode, true = decode
+}
+
+function f_encode_send(in ASP_UDP_RADIUS pl_ASP_UDP_RADIUS) runs on RADIUS_mapping_CT {
+   var ASP_UDP v_asp_udp;
+   v_asp_udp.data := f_RADIUS_Enc(pl_ASP_UDP_RADIUS.data);
+   v_asp_udp.addressf := pl_ASP_UDP_RADIUS.addressf;
+   v_asp_udp.portf := pl_ASP_UDP_RADIUS.portf;				
+   UDP_PCO.send(v_asp_udp);       
+}
+
+                             
+//function f_store_RequestAuth_Field
+//function f_store_last
+
+function f_RADIUS_EncDec_Start(RADIUS_Mode pl_RADIUS_Mode) runs on RADIUS_mapping_CT {
+	
+	var ASP_UDP_RADIUS v_asp_udp_radius;
+        var ASP_UDP v_asp_udp;
+
+	while (true) {
+	  alt {                
+                 /////////////////////////////////
+                 // incoming messages on upper port
+		 /////////////////////////////////
+		 [] UDP_RADIUS_PCO.receive(t_ASP_UDP_RADIUS) -> value v_asp_udp_radius {
+                     if (pl_RADIUS_Mode == server) {                                       
+                             f_handle_outgoing_server_message(v_asp_udp_radius)                                                                                                                                                                     
+                     }
+                     else { // client mode                                                                             
+                             f_handle_outgoing_client_message(v_asp_udp_radius)                                                                                                                                                                                                  
+                          }      
+		    }
+                        
+                 /////////////////////////////////
+                 // incoming messages on lower port
+		 /////////////////////////////////
+		 [] UDP_PCO.receive(t_ASP_UDP) -> value v_asp_udp {
+                 
+                     v_asp_udp_radius.data := f_RADIUS_Dec(v_asp_udp.data);
+	             v_asp_udp_radius.addressf := v_asp_udp.addressf;
+                     v_asp_udp_radius.portf := v_asp_udp.portf;                
+
+                     if (pl_RADIUS_Mode == server) { 
+                             f_handle_incoming_client_message(v_asp_udp_radius,v_asp_udp.data)  			     
+                     }                           
+                     else { // client mode                        
+                             f_handle_incoming_server_message(v_asp_udp_radius,v_asp_udp.data) 			                             
+                     }							   
+		   }                                                                                                                     
+	      }
+	 }
+}
+
+
+
+}  // end of module
