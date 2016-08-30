@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright (c) 2008, 2015  Ericsson AB
+* Copyright (c) 2008, 2016  Ericsson AB
 * All rights reserved. This program and the accompanying materials
 * are made available under the terms of the Eclipse Public License v1.0
 * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ type enum_8 skt_type_enum
 {
   service_key                   (1),
   prepaid_expired               (2),
+  data_zone_service             (3),
   preservation_indicator        (17)
 } 
 
@@ -53,7 +54,8 @@ type record skt_subattr_t {
   variant (skt_val) "CROSSTAG(
     string_val,               skt_type=preservation_indicator;
     byte_val,                 skt_type=prepaid_expired;
-    integer_val,              skt_type=service_key)"
+    integer_val,              skt_type=service_key;
+    string_val,               skt_type=data_zone_service)"
   }
 
 type set of skt_subattr_t skt_subattr_list;
