@@ -18,7 +18,7 @@
 //
 //  File:               RADIUS_EncDec.cc
 //  Description:        Encoder/Decoder and external functions for RPMG
-//  Rev:                R13A
+//  Rev:                R14A
 //  Prodnr:             CNL 113 600
 //  Reference:          RFC 2865(RADIUS), 2866(RADIUS Accounting),        
 //                       

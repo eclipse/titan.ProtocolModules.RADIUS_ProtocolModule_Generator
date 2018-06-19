@@ -1,0 +1,772 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               RadiusBaseAttributes.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 2865(RADIUS)       
+//                       
+//                      
+//
+
+
+// APPLICATION-NAME: Base
+
+
+
+// Packet-Type: Access-Request (1)
+
+// Packet-Type: Access_Accept (2)
+
+// Packet-Type: Access_Reject (3)
+
+// Packet-Type: Accounting_Request (4) 
+
+// Packet-Type: Accounting_Response (5)
+
+// Packet-Type: Access_Challenge (11)
+
+// Packet-Type: Status_Server (12)
+
+// Packet-Type: Status_Client (13)
+
+// Packet-Type: Reserved (255)
+
+
+
+
+// RFC 2865
+// Attrib: User-Name (1)
+type Attrib_String User_Name;
+
+// RFC 2865
+// Attrib: User-Password (2)
+type Attrib_String User_Password;
+
+// RFC 2865
+// Attrib: CHAP-Password (3)
+type record CHAP_Password 
+{
+  UINT8 CHAP_Ident,
+  Attrib_String String length(16)
+}
+
+// RFC 2865
+// Attrib: NAS-IP-Address (4)
+type Attrib_Address NAS_IP_Address;
+
+// RFC 2865
+// Attrib: NAS-Port (5)
+type Attrib_Value NAS_Port;
+
+// RFC 2865
+// Attrib: Service-Type (6)
+type enumerated Service_Type
+{
+  Login (1),
+  Framed (2),
+  Callback_Login (3),
+  Callback_Framed (4),
+  Outbound (5),
+  Administrative (6),
+  NAS_Prompt (7),
+  Authenticate_Only (8),
+  Callback_NAS_Prompt (9),
+  Call_Check (10),
+  Callback_Administrative (11)
+}
+
+
+// RFC 2865
+// Attrib: Framed-Protocol (7)
+type enumerated Framed_Protocol
+{
+  PPP (1),
+  SLIP (2),
+  Appletalk_Remote_Access_Protocol (3),
+  Gandalf_proprietary_protocol (4),
+  Xylogics_proprietary (5),
+  Xpoint75_Syncronous (6),
+  GPRS_PDP_Context (7)  
+}
+
+
+// RFC 2865
+// Attrib: Framed-IP-Address (8)
+type Attrib_Address Framed_IP_Address;
+
+// RFC 2865
+// Attrib: Framed-IP-Netmask (9)
+type Attrib_Address Framed_IP_Netmask;
+
+// RFC 2865
+// Attrib: Framed-Routing (10)
+type enumerated Framed_Routing
+{
+  None (0),
+  Send_routing_pacets (1),
+  Listen_for_routing_pacets (2),
+  Send_and_Listen (3)
+}
+
+// RFC 2865
+// Attrib: Filter-Id (11)
+type Attrib_Text Filter_Id;
+
+// RFC 2865
+// Attrib: Framed-MTU (12)
+type Attrib_Value Framed_MTU (64..65535);
+
+// RFC 2865
+// Attrib: Framed-Compression (13)
+type enumerated Framed_Compression
+{
+  None (0),
+  VJ_TCP_IP_header_compression (1),
+  IPX_header_compression (2),
+  STAC_LZS_compression (3)
+}
+
+// RFC 2865
+// Attrib: Login-IP-Host (14)
+type Attrib_Address Login_IP_Host;
+
+// RFC 2865
+// Attrib: Login-Service (15)
+type enumerated Login_Service
+{
+  Telnet (0),
+  Rlogin (1),
+  TCP_Clear (2),
+  Port_Master (3),
+  LAT (4),
+  X25_PAD (5),
+  X25_T3POS (6),
+  TCP_Clear_Quiet (7)
+}
+
+// RFC 2865
+// Attrib: Login-TCP-Port (16)
+type Attrib_Value Login_TCP_Port (0..65535);
+
+// RFC 2865
+// Attrib: Reply-Message (18)
+type Attrib_Text Reply_Message;
+
+// RFC 2865
+// Attrib: Callback-Number (19)
+type Attrib_String Callback_Number;
+
+// RFC 2865
+// Attrib: Callback-Id (20)
+type Attrib_String Callback_Id;
+
+// RFC 2865
+// Attrib: Framed-Route (22)
+type Attrib_Text Framed_Route;
+
+// RFC 2865
+// Attrib: Framed-IPX-Network (23)
+type Attrib_Value Framed_IPX_Network;
+
+// RFC 2865
+// Attrib: State (24)
+type Attrib_String State;
+
+// RFC 2865
+// Attrib: Class (25)
+type Attrib_String Class;
+
+
+// RFC 2865
+// Attrib: Session-Timeout (27)
+type Attrib_Value Session_Timeout;
+
+// RFC 2865
+// Attrib: Idle-Timeout (28)
+type Attrib_Value Idle_Timeout;
+
+// RFC 2865
+// Attrib: Termination-Action (29)
+type enumerated Termination_Action
+{
+  Default (0),
+  RADIUS_Request (1)
+}
+
+// RFC 2865
+// Attrib: Called-Station-Id (30)
+type Attrib_String Called_Station_Id;
+
+// RFC 2865
+// Attrib: Calling-Station-Id (31)
+type Attrib_String Calling_Station_Id;
+
+// RFC 2865
+// Attrib: NAS-Identifier (32)
+type Attrib_String NAS_Identifier;
+
+// RFC 2865
+// Attrib: Proxy-State (33)
+type Attrib_String Proxy_State;
+
+// RFC 2865
+// Attrib: Login-LAT-Service (34)
+type Attrib_String Login_LAT_Service;
+
+// RFC 2865
+// Attrib: Login-LAT-Node (35)
+type Attrib_String Login_LAT_Node;
+
+// RFC 2865
+// Attrib: Login-LAT-Group (36)
+type Attrib_String Login_LAT_Group;
+
+// RFC 2865
+// Attrib: Framed-AppleTalk-Link (37)
+type Attrib_Value Framed_AppleTalk_Link (0..65535);
+
+// RFC 2865
+// Attrib: Framed-AppleTalk-Network (38)
+type Attrib_Value Framed_AppleTalk_Network (0..65535);
+
+// RFC 2865
+// Attrib: Framed-AppleTalk-Zone (39)
+type Attrib_String Framed_AppleTalk_Zone;
+
+// RFC 2865
+// Attrib: CHAP-Challenge (60)
+type Attrib_String CHAP_Challenge;
+
+// RFC 2865
+// Attrib: NAS-Port-Type (61)
+type enumerated NAS_Port_Type
+{
+  Async (0),
+  Sync (1),
+  ISDN_Sync (2),
+  ISDN_Async_v120 (3),
+  ISDN_Async_v110 (4),
+  Virtual (5),
+  PIAFS (6),
+  HDLC_Clear_Channel (7),
+  X25 (8),
+  X75 (9),
+  G3_Fax (10),
+  SDSL_Symmetric_DSL (11),
+  ADSL_CAP_Asymmetric_DSL (12),
+  ADSL_DMT_Asymmetric_DSL (13),
+  ISDL_ISDN_Digital_Subscriber_Line (14),
+  Ethernet (15),
+  xDSL (16),
+  Cable (17),
+  Wireless_Other (18),
+  Wireless_IEEE_80211 (19)
+}
+
+
+// RFC 2865
+// Attrib: Port-Limit (62)
+type Attrib_Value Port_Limit;
+
+// RFC 2865
+// Attrib: Login-LAT-Port (63)
+type Attrib_String Login_LAT_Port;
+
+
+
+// RFC 2865
+// Attrib: Vendor-Specific (26)
+type record Vendor_Specific 
+{
+  vendor_id_enum     vendor_id,
+  string_val_spec    attrib_value
+} with {
+  variant (attrib_value) "CROSSTAG(f_scap_subattr_list, vendor_id=scap;
+  f_acc_subattr_list,  vendor_id=acc;
+  f_cisco_subattr_list, vendor_id=cisco;
+  f_ericsson_subattr_list, vendor_id=ericsson;
+  f_microsoft_subattr_list, vendor_id=microsoft;
+  f_adslforum_subattr_list, vendor_id=adslforum;
+  f_cdma2000_subattr_list, vendor_id=cdma2000 ;
+  f_servicefactory_subattr_list, vendor_id=servicefactory;
+  f_threegpp_subattr_list, vendor_id=threegpp;
+  f_wispr_subattr_list, vendor_id=wispr)"
+  }
+
+
+type enum_32 vendor_id_enum
+{
+  acc                (5),
+  cisco              (9),
+  ericsson         (193),
+  microsoft        (311),
+  adslforum       (3561),
+  cdma2000        (5535),
+  servicefactory  (5556),
+  threegpp       (10415),
+  scap           (10923),
+  wispr          (14122)
+} 
+
+
+type enum_8 acc_type_enum
+{
+  acc_error_message           (1),
+  acc_ccp_option              (2),
+  acc_customer_id             (6),
+  acc_tunnel_secret          (14),
+  acc_service_profile        (17),
+  acc_request_type           (18),
+  acc_dns_server_pri         (23),
+  acc_dns_server_sec         (24),
+  acc_nbns_server_pri        (25),
+  acc_nbns_server_sec        (26),
+  acc_dial_port_index        (27),
+  acc_mn_ha_shared_secret    (73),
+  acc_mip_spi                (74)
+} 
+
+
+type enum_8 cisco_type_enum
+{
+  cisco_access_control_list    (1),
+  cisco_nas_port               (2),
+  cisco_info_service         (250),
+  cisco_service_list         (251),
+  cisco_n_service_info       (252),
+  cisco_byte_count           (253)
+} 
+
+
+type enum_8 ericsson_type_enum
+{
+  product_profile                  (1),
+  digest_response                 (14),
+  digest_attributes               (15),
+  pmk                             (17),
+  layer_identity                  (34),
+  major_protocol_version          (35),
+  minor_protocol_version          (36),
+  ipt_timestamp                  (126),
+  master_session_id              (200),
+  message_from_sn                (202),
+  requested_url                  (203),
+  authorization_result_code      (204),
+  cds_uid                        (205),
+  msisdn                         (206),
+  authentication_type            (207),
+  timestamp_created              (208),
+  timestamp_used                 (209),
+  access_type                    (210),
+  requested_service_id           (211),
+  user_alias                     (212),
+  service_session_id             (213)
+} 
+
+
+type enum_8 cdma2000_type_enum
+{
+  ike_pre_shared_secret_request    (1),
+  security_level                   (2),
+  pre_shared_secret                (3),
+  reverse_tunnel_specification     (4),
+  differentiated_services_class    (5),
+  container                        (6),
+  home_agent                       (7),
+  key_id                           (8),
+  pcf_ip_addr                      (9),
+  bs_msc_addr                     (10),
+  userid                          (11),
+  forward_mux                     (12),
+  reverse_mux                     (13),
+  forward_fundamental_rate        (14),
+  reverse_fundamental_rate        (15),
+  service_option                  (16),
+  forward_traffic_type            (17),
+  reverse_traffic_type            (18),
+  fundamental_frame_size          (19),
+  forward_fundamental_rc          (20),
+  reverse_fundamental_rc          (21),
+  ip_technology                   (22),
+  compulsory_tunnel_indicator     (23),
+  release_indicator               (24),
+  bad_frame_count                 (25),
+  num_active                      (30),
+  sdb_input_octects               (31),
+  sdb_output_octects              (32),
+  numsdb_input                    (33),
+  numsdb_output                   (34),
+  ip_QoS                          (36),
+  air_QoS                         (39),
+  airlink_record_type             (40),
+  rp_session_id                   (41),
+  airlink_secuence_number         (42),
+  num_bytes_received_total        (43),
+
+  correlation_id                  (44),
+  mo_mt_indicator                 (45),
+  mobile_ip_sig_inbound_count     (46),
+  mobile_ip_sig_outbound_count    (47),
+  session_cont                    (48),
+  active_time                     (49),
+  dcch_frame_format               (50),
+  ESN                             (52),
+  s_key                           (54),
+  s_request                       (55),
+  s_lifetime                      (56),
+  mn_ha_shared_secret_request     (57),
+  mn_ha_shared_secret             (58),
+  remote_ipv4_address             (59),
+  hrpd_access_authentication      (60),
+
+  remote_ipv6_address             (70),
+  remote_address_table_index      (71),
+  remote_address_octet_count      (72),
+  always_on                       (78),
+  last_user_activity_time         (80),
+
+  session_termination_capability  (88),
+  prepaid_accounting_quota        (90),
+  prepaid_accounting_capability   (91),
+  mip_rrq_lifetime                (92),
+  service_reference_id            (94),
+  disconnect_reason               (96),
+  cdma2000_error_cause           (255) // WARNING: temporary type number, not yet standardized 2003-06-17 tmptso
+} 
+
+
+type enum_8 threegpp_type_enum
+{
+  threegpp_imsi                           (1),
+  threegpp_charging_id                    (2),
+  threegpp_pdp_type                       (3),
+  threegpp_charging_gateway_address       (4),
+  threegpp_gprs_negotiated_qos_profile    (5),
+  threegpp_sgsn_ip_address                (6),
+  threegpp_ggsn_ip_address                (7),
+  threegpp_imsi_mcc_mnc                   (8),
+  threegpp_ggsn_mcc_mnc                   (9),
+  threegpp_nsapi                         (10),
+  threegpp_session_stop_indicator        (11),
+  threegpp_selection_mode                (12),
+  threegpp_charging_characteristics      (13),
+  threegpp_cg_ipv6_address               (14),
+  threegpp_sgsn_ipv6_address             (15),
+  threegpp_ggsn_ipv6_address             (16),
+  threegpp_ipv6_dns_servers              (17),
+  threegpp_sgsn_mcc_mnc                  (18),
+  threegpp_teardown_indicator            (19),
+  threegpp_imeisv                        (20),
+  threegpp_rat_type                      (21),
+  threegpp_user_location_info            (22),
+  threegpp_ms_timezone                   (23),
+  threegpp_camel_charging_info           (24),
+  threegpp_packet_filter                 (25),
+  threegpp_negotiated_dscp               (26),
+  threegpp_chargeable_user_identity      (89) // FIXME no standard reference available ETIBSZA
+} 
+
+
+type enum_8 servicefactory_type_enum
+{
+  servicefactory_product_profile_id    (1),
+  servicefactory_access_point_id       (7),
+  servicefactory_apn                  (14) // FIXME no standard reference available ETIBSZA
+} 
+
+
+type enum_8 microsoft_type_enum
+{
+  microsoft_chap_mppe_keys    (12),
+  microsoft_mppe_send_key     (16),
+  microsoft_mppe_recv_key     (17),
+  microsoft_primary_dns_server   (28),
+  microsoft_secondary_dns_server (29),
+  microsoft_primary_nbns_server   (30),
+  microsoft_secondary_nbns_server (31)
+} 
+
+type enum_8 adslforum_type_enum
+{
+  adslforum_agent_circuit_id (1)
+} 
+
+
+type enum_8 wispr_type_enum
+{
+  wispr_location_id (1),
+  wispr_location_name(2)
+} 
+
+type enum_8 scap_type_enum
+{
+  requested_service_unit        (1),
+  used_service_unit             (2),
+  granted_service_unit          (3),
+  unit_type                     (4),
+  unit_value                    (5),
+  value_digits                  (6),
+  exponent                      (7),
+  currency_code                 (8),
+  subscription_id               (9),
+  additional_subscription_id    (10),
+  subscription_id_type          (11),
+  subscription_id_data          (12),
+  event_timestamp               (13),
+  accounting_record_number      (14),
+  result_code                   (15),
+  accounting_interim_interval   (16),
+  origin_state_id               (17),
+  suggested_primary_rulespace   (30),
+  suggested_secondary_rulespace (31)
+} 
+
+
+type enum_8 scap_unit_type_enum {
+  SERVICE_CREDIT_TIME     (0),
+  SERVICE_CREDIT_VOLUME   (1),
+  SERVICE_CREDIT_EVENT    (2),
+  SERVICE_CREDIT_MONEY    (3)
+} 
+
+
+type enum_8 scap_subsription_id_type_enum {
+  END_USER_MSISDN   (0),
+  END_USER_IMSI     (1),
+  END_USER_SIP_URL  (2),
+  END_USER_NAI      (3),
+  END_USER_PRIVATE  (4)
+} 
+
+type record scap_unit_type_t {
+  scap_type_enum      scap_type,
+  UINT8               scap_length,
+  INT32             scap_val
+} with {
+    variant (scap_length) "LENGTHTO(scap_type, scap_length, scap_val)"
+}
+
+type set of scap_unit_type_t unit_value_list;
+
+type union unit_value_t
+{
+  octetstring                   string_val,
+  scap_unit_type_enum           unit_type_val,
+  scap_subsription_id_type_enum subsription_id_type_val,
+  unit_value_list               unit_type_list,
+  INT32                       integer_val,
+  charstring                    unichar_val
+} 
+
+
+type record service_unit_t {
+  scap_type_enum        scap_type,
+  UINT8                 scap_length,
+  unit_value_t          scap_val
+} with {
+  variant (scap_length) "LENGTHTO(scap_type, scap_length, scap_val)";
+  variant (scap_val) "CROSSTAG(
+  unit_type_val,           scap_type=unit_type;
+  unit_type_list,          scap_type=unit_value;
+  integer_val,             scap_type=value_digits;
+  integer_val,             scap_type=exponent;
+  integer_val,             scap_type=currency_code;
+  unit_type_list,          scap_type=subscription_id;
+  integer_val,             scap_type=additional_subscription_id;
+  subsription_id_type_val, scap_type=subscription_id_type;
+  unichar_val,             scap_type=subscription_id_data;
+  integer_val,             scap_type=event_timestamp;
+  integer_val,             scap_type=accounting_record_number;
+  integer_val,             scap_type=result_code;
+  integer_val,             scap_type=accounting_interim_interval;
+  integer_val,             scap_type=origin_state_id)"
+ }
+
+
+type set of service_unit_t service_unit_list;
+
+
+type union scap_value {
+  octetstring                   string_val,
+  scap_unit_type_enum           unit_type_val,
+  unit_value_list               unit_type_list,
+  service_unit_list             f_service_unit_list,
+  scap_subsription_id_type_enum subscription_id_type_val,
+  INT32                       integer_val,
+  charstring                    unichar_val,
+  charstring                    charstring_val
+}  
+
+
+type record scap_subattr_t {
+  scap_type_enum      scap_type,
+  UINT8               scap_length,
+  scap_value          scap_val
+} with {
+  variant (scap_length) "LENGTHTO(scap_type, scap_length, scap_val)";
+  variant (scap_val) "CROSSTAG(
+    f_service_unit_list,      scap_type=requested_service_unit;
+    f_service_unit_list,      scap_type=used_service_unit;
+    f_service_unit_list,      scap_type=granted_service_unit;
+    unit_type_val,            scap_type=unit_type;
+    unit_type_list,           scap_type=unit_value;
+    integer_val,              scap_type=value_digits;
+    integer_val,              scap_type=exponent;
+    integer_val,              scap_type=currency_code;
+    f_service_unit_list,      scap_type=subscription_id;
+    integer_val,              scap_type=additional_subscription_id;
+    subscription_id_type_val, scap_type=subscription_id_type;
+    unichar_val,              scap_type=subscription_id_data;
+    integer_val,              scap_type=event_timestamp;
+    integer_val,              scap_type=accounting_record_number;
+    integer_val,              scap_type=result_code;
+    integer_val,              scap_type=accounting_interim_interval;
+    integer_val,              scap_type=origin_state_id;
+    charstring_val,           scap_type=suggested_primary_rulespace;
+    charstring_val,           scap_type=suggested_secondary_rulespace)"
+  }
+
+type set of scap_subattr_t scap_subattr_list;
+
+
+
+
+
+type record acc_type
+{
+  acc_type_enum                   f_acc_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_acc_type, attrib_length_spec, string_val)"
+  }
+
+type set of acc_type acc_subattr_list;
+
+type record cisco_type
+{
+  cisco_type_enum                 f_cisco_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_cisco_type, attrib_length_spec, string_val)"
+  }
+
+type set of cisco_type cisco_subattr_list;
+
+
+type record ericsson_type
+{
+  ericsson_type_enum              f_ericsson_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_ericsson_type, attrib_length_spec, string_val)"
+  }
+
+type set of ericsson_type ericsson_subattr_list;
+
+
+type record cdma2000_type
+{
+  cdma2000_type_enum              f_cdma2000_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_cdma2000_type, attrib_length_spec,string_val)"
+  }
+
+type set of cdma2000_type cdma2000_subattr_list;
+
+
+type record threegpp_type
+{
+  threegpp_type_enum              f_threegpp_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_threegpp_type, attrib_length_spec, string_val)"
+  }
+
+type set of threegpp_type threegpp_subattr_list;
+
+type record microsoft_type
+{
+  microsoft_type_enum             f_microsoft_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_microsoft_type, attrib_length_spec, string_val)"
+  }
+
+type set of microsoft_type microsoft_subattr_list;
+
+type record servicefactory_type
+{
+  servicefactory_type_enum        f_servicefactory_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_servicefactory_type, attrib_length_spec, string_val)"
+  }
+
+type set of servicefactory_type servicefactory_subattr_list;
+
+type record adslforum_type
+{
+  adslforum_type_enum             f_adslforum_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_adslforum_type, attrib_length_spec, string_val)"
+  }
+
+type set of adslforum_type adslforum_subattr_list;
+
+
+type record wispr_type
+{
+  wispr_type_enum                 f_wispr_type,
+  UINT8                           attrib_length_spec,
+  octetstring                     string_val
+} with {
+  variant (attrib_length_spec) "LENGTHTO(f_wispr_type, attrib_length_spec, string_val)"
+  }
+
+type set of wispr_type wispr_subattr_list;
+
+
+
+type union string_val_spec
+{
+  acc_subattr_list            f_acc_subattr_list,
+  cisco_subattr_list          f_cisco_subattr_list,
+  ericsson_subattr_list       f_ericsson_subattr_list,
+  cdma2000_subattr_list       f_cdma2000_subattr_list,
+  threegpp_subattr_list       f_threegpp_subattr_list,
+  microsoft_subattr_list      f_microsoft_subattr_list,
+  servicefactory_subattr_list f_servicefactory_subattr_list,
+  adslforum_subattr_list      f_adslforum_subattr_list,
+  wispr_subattr_list          f_wispr_subattr_list,
+  scap_subattr_list           f_scap_subattr_list,
+  octetstring                 f_string_val
+}
+
+
+

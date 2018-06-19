@@ -18,7 +18,7 @@
 #                                                                           #
 #  File:               ATTR.awk                                             #
 #  Description:	       RPMG AWK script for weaving RDF files                #
-#  Rev:                R13A
+#  Rev:                R14A
 #  Prodnr:             CNL 113 600                                          #
 #############################################################################
 

@@ -1,0 +1,92 @@
+/******************************************************************************
+* Copyright (c) 2008, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+* Timea Moder
+* Endre Kulcsar
+* Gabor Szalai
+* Janos Kovesdi
+* Kulcsár Endre
+* Zoltan Medve
+* Tamas Korosi
+******************************************************************************/
+
+//
+//  File:               RadiusBaseTypes.rdf
+//  Rev:                <RnXnn>
+//  Prodnr:             CNL 113 600
+//  Reference:          RFC 2865(RADIUS)       
+//                       
+//                      
+//
+
+
+//
+// External functions for encoding and decoding
+//
+
+external function f_RADIUS_Enc(in PDU_RADIUS pdu) return octetstring;
+external function f_RADIUS_Dec(in octetstring stream) return PDU_RADIUS;
+external function crypt_password(in octetstring P,in octetstring req_auth,in octetstring salt,in boolean decrypt,in charstring secret) return octetstring; 
+external function f_calc_MD5(in octetstring input) return octetstring; 
+
+
+
+//
+// Basic type definitions
+//
+
+type integer UINT8 (0..255) with {
+variant "FIELDLENGTH(8)"
+variant "BYTEORDER(last)"
+}
+
+type integer UINT16 (0..65535) with {
+variant "FIELDLENGTH(16)"
+variant "BYTEORDER(last)"
+}
+
+type integer UINT24 (0..16777215) with {
+variant "FIELDLENGTH(24)"
+variant "BYTEORDER(last)"
+}
+
+type integer UINT32 (0..4294967296) with {
+variant "FIELDLENGTH(32)"
+variant "BYTEORDER(last)"
+}
+
+type integer UINT64 with {
+variant "FIELDLENGTH(64)"
+variant "BYTEORDER(last)"
+}
+
+type integer INT32 with {
+variant "FIELDLENGTH(32)"
+variant "BYTEORDER(last)"
+variant "COMP(2scompl)"
+}
+
+type octetstring OCTET1 length(1) 
+type octetstring OCTET2 length(2) 
+type octetstring OCTET3 length(3)
+type octetstring OCTET4 length(4)
+type octetstring OCTET8 length(8)
+type octetstring OCTET16 length(16)
+
+//
+//  Basic Attribute Data Formats
+//
+
+type charstring Attrib_Text length(1..253) with { variant "PADDING(yes)"};
+type octetstring Attrib_String length(1..253);
+type OCTET4 Attrib_Address;
+type OCTET4 Attrib_Time;
+type UINT32 Attrib_Value;
+
+
+
